@@ -1,0 +1,7 @@
+./stubs/l0.v
+./stubs/ofifo.v
+../individual_mac/Shail/mac.v
+../individual_mac/Shail/mac_row.v
+../individual_mac/Shail/mac_array.v
+./verilog/corelet.v
+./verilog/core.v
