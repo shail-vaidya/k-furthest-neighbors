@@ -68,7 +68,7 @@ corelet #(
     .l0_wr              (inst[2]),
     .l0_wdata           (),
     // IFIFO Ports
-    .ififo_rd           (inst[6]),
+    .ififo_rd           (inst[4]),
     .ififo_wr           (inst[5]),
     .ififo_wdata        (),
     // SFP Ports
