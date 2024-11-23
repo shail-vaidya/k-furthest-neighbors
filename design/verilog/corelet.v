@@ -23,7 +23,7 @@ module corelet #(
     // OFIFO Ports
     input                       ofifo_rd,
     output                      ofifo_valid,
-    output  [psum*col-1:0]      ofifo_rdata,
+    output  [psum_bw*col-1:0]   ofifo_rdata,
     // L0 Ports
     input                       l0_rd,
     input                       l0_wr,
@@ -114,7 +114,7 @@ l0 #(
 //                  OFIFO Instance
 //*************************************************************
 ofifo #(
-    .bw     (bw),
+    .bw     (psum_bw),
     .col    (col)
 ) ofifo_inst (
     .clk        (clk),
