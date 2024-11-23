@@ -4,4 +4,6 @@
 ../individual_mac/Shail/mac_row.v
 ../individual_mac/Shail/mac_array.v
 ./verilog/corelet.v
+./verilog/sram0_2048x32.v
+./verilog/sram1_2048x128.v
 ./verilog/core.v
