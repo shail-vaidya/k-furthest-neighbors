@@ -19,7 +19,7 @@ module corelet #(
     input                       clk,
     input                       reset,
     // PE Array Ports
-    input   [1:0]               inst_w,
+    input   [2:0]               inst_w,
     // OFIFO Ports
     input                       ofifo_rd,
     output                      ofifo_valid,
@@ -33,7 +33,7 @@ module corelet #(
     input                       ififo_wr,
     input   [bw*row-1:0]        ififo_wdata,
     // SFP Ports
-    output                      sfp_out
+    output  [psum_bw*col-1:0]        sfp_out
 );
 
 //*************************************************************
@@ -48,7 +48,7 @@ wire [bw*row-1:0]       l0_rdata;
 //*************************************************************
 //                      Stubbing (To be removed)
 //*************************************************************
-assign sfp_out = 1'b0;
+assign sfp_out = {psum_bw*col{1'b0}};
 
 //*************************************************************
 //                      Misc  Logic
@@ -80,8 +80,8 @@ mac_array #(
 //                  L0 Instance
 //*************************************************************
 l0 #(
-    .bw     (bw),
-    .row    (row)
+    .bw         (bw),
+    .row        (row)
 ) l0_inst (
     .clk        (clk),
     .reset      (reset),
@@ -89,16 +89,16 @@ l0 #(
     .rd         (l0_rd),
     .in         (l0_wdata),
     .out        (l0_rdata),
-    .o_full     (),     //TODO
-    .o_ready    ()      //TODO
+    .o_full     (),             // Unused
+    .o_ready    ()              // Unused
 );
 
 //*************************************************************
 //                  IFIFO Instance
 //*************************************************************
 l0 #(
-    .bw     (bw),
-    .row    (col)
+    .bw         (bw),
+    .row        (col)
 ) ififo_inst (
     .clk        (clk),
     .reset      (reset),
@@ -106,8 +106,8 @@ l0 #(
     .rd         (ififo_rd),
     .in         (ififo_wdata),
     .out        (ififo_rdata),
-    .o_full     (),     //TODO
-    .o_ready    ()      //TODO
+    .o_full     (),             // Unused
+    .o_ready    ()              // Unused
 );
 
 //*************************************************************
@@ -123,11 +123,14 @@ ofifo #(
     .rd         (ofifo_rd),
     .in         (ofifo_wdata),
     .out        (ofifo_rdata),
-    .o_full     (),         //TODO
-    .o_ready    (),         //TODO
-    .o_valid    (ofifo_valid)
+    .o_valid    (ofifo_valid),
+    .o_full     (),             // Unused
+    .o_ready    ()              // Unused
 );
 
+//*************************************************************
+//                  Special Function Processor (To be added)
+//*************************************************************
 
 endmodule
 

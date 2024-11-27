@@ -15,7 +15,7 @@ parameter len_nij = 36;
 reg clk = 0;
 reg reset = 1;
 
-wire [33:0] inst_q; 
+wire [34:0] inst_q; 
 
 reg [1:0]  inst_w_q = 0; 
 reg [bw*row-1:0] D_xmem_q = 0;
@@ -38,6 +38,7 @@ reg l0_rd_q = 0;
 reg l0_wr_q = 0;
 reg execute_q = 0;
 reg load_q = 0;
+reg mode_q = 0;
 reg acc_q = 0;
 reg acc = 0;
 
@@ -66,18 +67,19 @@ integer captured_data;
 integer t, i, j, k, kij;
 integer error;
 
-assign inst_q[33] = acc_q;
-assign inst_q[32] = CEN_pmem_q;
-assign inst_q[31] = WEN_pmem_q;
-assign inst_q[30:20] = A_pmem_q;
-assign inst_q[19]   = CEN_xmem_q;
-assign inst_q[18]   = WEN_xmem_q;
-assign inst_q[17:7] = A_xmem_q;
-assign inst_q[6]   = ofifo_rd_q;
-assign inst_q[5]   = ififo_wr_q;
-assign inst_q[4]   = ififo_rd_q;
-assign inst_q[3]   = l0_rd_q;
-assign inst_q[2]   = l0_wr_q;
+assign inst_q[34] = acc_q;
+assign inst_q[33] = CEN_pmem_q;
+assign inst_q[32] = WEN_pmem_q;
+assign inst_q[31:21] = A_pmem_q;
+assign inst_q[20]   = CEN_xmem_q;
+assign inst_q[19]   = WEN_xmem_q;
+assign inst_q[18:8] = A_xmem_q;
+assign inst_q[7]   = ofifo_rd_q;
+assign inst_q[6]   = ififo_wr_q;
+assign inst_q[5]   = ififo_rd_q;
+assign inst_q[4]   = l0_rd_q;
+assign inst_q[3]   = l0_wr_q;
+assign inst_q[2]   = mode_q; 
 assign inst_q[1]   = execute_q; 
 assign inst_q[0]   = load_q; 
 

@@ -6,9 +6,9 @@ parameter bw = 4;
 parameter psum_bw = 16;
 
 output [psum_bw-1:0] out_s;
-input  [bw-1:0] in_w; // inst[2]:mode, inst[1]:execute, inst[0]: kernel loading
+input  [bw-1:0] in_w; 
 output [bw-1:0] out_e; 
-input  [2:0] inst_w;
+input  [2:0] inst_w;	// inst[2]:mode, inst[1]:execute, inst[0]: kernel loading
 output [2:0] inst_e;
 input  [psum_bw-1:0] in_n;
 input  clk;

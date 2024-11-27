@@ -3,12 +3,12 @@
 ./verilog/common_ip/fifo_mux_16_1.v
 ./verilog/common_ip/fifo_depth8.v
 ./verilog/common_ip/fifo_depth64.v
-../individual_mac/Shail/l0.v
-../individual_mac/Shail/ofifo.v
+../individual_files/Shail/l0.v
+../individual_files/Shail/ofifo.v
 ./verilog/PE_array/mac.v
-../individual_mac/Shail/mac_tile.v
-../individual_mac/Shail/mac_row.v
-../individual_mac/Shail/mac_array.v
+./verilog/PE_array/mac_tile.v
+./verilog/PE_array/mac_row.v
+./verilog/PE_array/mac_array.v
 ./verilog/corelet.v
 ./verilog/memories/sram0_2048x32.v
 ./verilog/memories/sram1_2048x128.v
