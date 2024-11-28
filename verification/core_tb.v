@@ -139,7 +139,7 @@ initial begin
     #0.5 clk = 1'b1;   
   end
 
-  #0.5 clk = 1'b0;  WEN_xmem = 1;  CEN_xmem = 1; A_xmem = 0;
+  #0.5 clk = 1'b0;  WEN_xmem = 1;  CEN_xmem = 1; A_xmem = 0; 
   #0.5 clk = 1'b1; 
 
   $fclose(x_file);
@@ -149,7 +149,7 @@ initial begin
   for (kij=0; kij<9; kij=kij+1) begin  // kij loop
 
     case(kij)
-     0: w_file_name = "weight_itile0_otile0_kij0.txt";
+     0: w_file_name = "weight_itile0_otile0_kij0.txt"; //all ic and oc; 32 bits = 4*(rows)
      1: w_file_name = "weight_itile0_otile0_kij1.txt";
      2: w_file_name = "weight_itile0_otile0_kij2.txt";
      3: w_file_name = "weight_itile0_otile0_kij3.txt";
@@ -181,15 +181,10 @@ initial begin
     #0.5 clk = 1'b0;   
     #0.5 clk = 1'b1;   
 
-
-
-
-
     /////// Kernel data writing to memory ///////
 
     A_xmem = 11'b10000000000;
-
-    for (t=0; t<col; t=t+1) begin  
+    for (t=0; t<col; t=t+1) begin  //iterating over all cols (oc)
       #0.5 clk = 1'b0;  w_scan_file = $fscanf(w_file,"%32b", D_xmem); WEN_xmem = 0; CEN_xmem = 0; if (t>0) A_xmem = A_xmem + 1; 
       #0.5 clk = 1'b1;  
     end
@@ -198,19 +193,35 @@ initial begin
     #0.5 clk = 1'b1; 
     /////////////////////////////////////
 
-
-
+    A_xmem = 11'b10000000000;
     /////// Kernel data writing to L0 ///////
-    ...
+    for (m=0; m<col; m=m+1) begin //o_full needs to be added ; 7th row is getting populated first. should we reverse it?
+      #0.5 clk = 1'b0; WEN_xmem = 1; l0_wr=1; CEN_xmem = 0; if (m>0) A_xmem = A_xmem + 1; 
+      #0.5 clk = 1'b1; 
+    end
+      #0.5 clk = 1'b0; WEN_xmem = 1; CEN_xmem = 1; A_xmem = 0; 
+      #0.5 clk = 1'b1; 
     /////////////////////////////////////
 
-
-
-    /////// Kernel loading to PEs ///////
-    ...
+    //reading actmem from SRAM0 
+    A_xmem   = 0;
+    /////// Kernel/Act loading to PEs and act writing to L0///////
+    for (m=0; m<len_nij; m=m+1) begin //o_full needs to be added ; 7th row is getting populated first. should we reverse it?
+      #0.5 clk = 1'b0; WEN_xmem = 1; l0_wr=1; l0_rd = 1; CEN_xmem = 0; if (m>0) A_xmem = A_xmem + 1; 
+      #0.5 clk = 1'b1; 
+    end
+      #0.5 clk = 1'b0; WEN_xmem = 1;  CEN_xmem = 1; A_xmem = 0; l0_wr=0; l0_rd = 0;
+      #0.5 clk = 1'b1; 
     /////////////////////////////////////
   
-
+    /////// Last 8 act loading to PE ///////
+    for (m=0; m<col; m=m+1) begin //o_full needs to be added ; 7th row is getting populated first. should we reverse it?
+      #0.5 clk = 1'b0; WEN_xmem = 1; l0_rd=1; CEN_xmem = 1; if (m>0) A_xmem = A_xmem + 1; //SRAM can be off
+      #0.5 clk = 1'b1; 
+    end
+      #0.5 clk = 1'b0; WEN_xmem = 1; CEN_xmem = 1; A_xmem = 0; l0_wr = 0; l0_rd = 0;
+      #0.5 clk = 1'b1; 
+    /////////////////////////////////////
 
     ////// provide some intermission to clear up the kernel loading ///
     #0.5 clk = 1'b0;  load = 0; l0_rd = 0;
