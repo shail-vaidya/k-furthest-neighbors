@@ -20,6 +20,7 @@ reg [bw-1:0] b_q;
 reg [psum_bw-1:0] c_q;
 reg [psum_bw-1:0] c_pipe_q;
 reg load_ready_q;
+reg shift_ready_q;
 wire [psum_bw-1:0] mac_out;
 
 // ---------------------------------
