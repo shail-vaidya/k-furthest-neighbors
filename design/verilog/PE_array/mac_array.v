@@ -15,25 +15,26 @@ module mac_array (clk, reset, out_s, in_w, in_n, inst_w, valid);
   output [col-1:0] valid;
 
   wire [row*col-1:0] temp_valid;	// Wires for connecting the valid signals of each row
-  wire [(row+1)*psum_bw*col-1:0] temp;	// Wires for connecting the out_s of the previous to row to the in_n of the next row
-
+  wire [psum_bw*col*(row+1)-1:0] temp;
+  wire [3*row-1:0] temp_inst_in; 	// Wires to connect to input of temp_inst_q registers
+  wire [3*row-1:0] temp_inst_out;	// Wires to connect to output of temp_inst_q registers
   genvar i;
   for (i=1; i < row+1 ; i=i+1) begin : row_num
       mac_row #(.bw(bw), .psum_bw(psum_bw)) mac_row_instance (
       	.clk (clk),
       	.reset (reset),
-	.inst_w(temp_inst_out[3*i-1:3*(i-1)]),
-	.in_w(in_w[bw*i-1:bw*(i-1)]),
-	.in_n(temp[psum_bw*col*i-1:psum_bw*col*(i-1)]),
-	.out_s(temp[psum_bw*col*(i+1)-1:psum_bw*col*i]),
-	.valid(temp_valid[col*i-1:col*(i-1)])
+	      .inst_w(temp_inst_out[3*i-1:3*(i-1)]),
+	      .in_w(in_w[bw*i-1:bw*(i-1)]),
+	      .in_n(temp[psum_bw*col*i-1:psum_bw*col*(i-1)]),
+	      .out_s(temp[psum_bw*col*(i+1)-1:psum_bw*col*i]),
+	      .valid(temp_valid[col*i-1:col*(i-1)])
       );
   end
 
 
-  assign out_s = temp[psum_bw*col*row-1:psum_bw*col*(row-1)];	// Taking out_s of the last row as the final outputs of the mac_array 
+  assign out_s = temp[psum_bw*col*(row+1)-1:psum_bw*col*(row)];	// Taking out_s of the last row as the final outputs of the mac_array 
 
-
+  assign temp[psum_bw*col*1-1:psum_bw*col*0] = in_n[15:0];
   assign valid = temp_valid[row*col-1:(row-1)*col];		// Taking valids of the last row as the final valids for the columns of mac_array
 
 
@@ -45,8 +46,7 @@ module mac_array (clk, reset, out_s, in_w, in_n, inst_w, valid);
   reg  [3*row-1:0] temp_inst_q;		// Registers to pipe intructions from north to south for rows 	
   					// Note: temp_inst_q[1:0] not used as first row gets direct instruction
 					
-  wire [3*row-1:0] temp_inst_in; 	// Wires to connect to input of temp_inst_q registers
-  wire [3*row-1:0] temp_inst_out;	// Wires to connect to output of temp_inst_q registers
+
 
   always @ (posedge clk) begin
    // inst_w flows to row0 to row7
@@ -58,7 +58,7 @@ module mac_array (clk, reset, out_s, in_w, in_n, inst_w, valid);
 	end
   end
 
-  assign temp_inst_out[2:0] = temp_inst_in[2:0];		// Connecting first row instruction directly.	
+  assign temp_inst_out[2:0] = inst_w[2:0];		// Connecting first row instruction directly.	
   assign temp_inst_out[3*row-1:2] = temp_inst_q[3*row-1:2];	// Connecting all the outputs of temp_inst_q to wires. All except [1:0] as the first row gets direct instr.
   
   genvar j;
