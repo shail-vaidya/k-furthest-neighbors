@@ -7,7 +7,7 @@ module mac_row_tb;
 	reg reset = 1;
 	
 	reg [bw-1:0] in_w; // inst[1]:execute, inst[0]: kernel loading
-	reg [1:0] inst_w;
+	reg [2:0] inst_w;
 	//For now setting in_n to 0
 	reg [psum_bw*col-1:0] in_n = 0;
 	
@@ -31,48 +31,49 @@ module mac_row_tb;
 	
 		$display("-------------------- Computation start --------------------");
 		@(negedge clk);
-		inst_w = 2'b00;
+		inst_w = 3'b00;
 		in_w = 4'hF;
 		reset = 0;
 	
 		@(negedge clk);
 		in_w = 4'hF;
-		inst_w = 2'b01;
+		inst_w = 3'b01;
 
 		@(negedge clk);
 		in_w = 4'hE;
-		inst_w = 2'b01;
+		inst_w = 3'b01;
 	
 		@(negedge clk);
 		in_w = 4'hD;
-		inst_w = 2'b01;
+		inst_w = 3'b01;
 	
 		@(negedge clk);
 		in_w = 4'hC;
-		inst_w = 2'b01;
+		inst_w = 3'b01;
 
 		@(negedge clk);
 		in_w = 4'hB;
-		inst_w = 2'b01;
+		inst_w = 3'b01;
 
 		@(negedge clk);
 		in_w = 4'hA;
-		inst_w = 2'b01;
+		inst_w = 3'b01;
 	
 		@(negedge clk);
 		in_w = 4'h9;
-		inst_w = 2'b01;
+		inst_w = 3'b01;
 
 		@(negedge clk);
 		in_w = 4'h8;
-		inst_w = 2'b01;
+		inst_w = 3'b01;
 	
 		@(negedge clk);
 		in_w = 4'h1;
-		inst_w = 2'b10;
+		inst_w = 3'b10;
 
 		@(negedge clk);
 		in_w = 4'h2;
+		inst_w = 3'b00;
 	
 		@(negedge clk);
 		in_w = 4'h3;
@@ -98,4 +99,3 @@ module mac_row_tb;
 		$display("-------------------- Computation completed --------------------");
 	end
 endmodule
-
