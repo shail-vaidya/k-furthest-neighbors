@@ -1,23 +1,23 @@
 // Created by prof. Mingu Kang @VVIP Lab in UCSD ECE department
 // Please do not spread this code without permission 
-`define L0_GLOBAL_READ
+//`define L0_GLOBAL_READ
 module l0 (clk, in, out, rd, wr, o_full, reset, o_ready);
 
   parameter row  = 8;
   parameter bw = 4;
 
-  input  clk;
-  input  wr;
-  input  rd;
-  input  reset;
+  input               clk;
+  input               wr;
+  input               rd;
+  input               reset;
   input  [row*bw-1:0] in;
   output [row*bw-1:0] out;
-  output o_full;
-  output o_ready;
+  output              o_full;
+  output              o_ready;
 
-  wire [row-1:0] empty;
-  wire [row-1:0] full;
-  reg [row-1:0] rd_en;
+  wire [row-1:0]      empty;
+  wire [row-1:0]      full;
+  reg  [row-1:0]      rd_en;
   
   genvar i;
 
@@ -27,15 +27,15 @@ module l0 (clk, in, out, rd, wr, o_full, reset, o_ready);
 
   for (i=0; i<row ; i=i+1) begin : row_num
       fifo_depth64 #(.bw(bw)) fifo_instance (
-	 .rd_clk(clk),
-	 .wr_clk(clk),
-	 .rd(rd_en[i]),
-	 .wr(wr),
-         .o_empty(empty[i]),
-         .o_full(full[i]),
-	 .in(in[bw*(i+1)-1:bw*i]),
-	 .out(out[bw*(i+1)-1:bw*i]),
-         .reset(reset));
+	      .rd_clk   (clk),
+	      .wr_clk   (clk),
+	      .rd       (rd_en[i]),
+	      .wr       (wr),
+        .o_empty  (empty[i]),
+        .o_full   (full[i]),
+	      .in       (in[bw*(i+1)-1:bw*i]),
+	      .out      (out[bw*(i+1)-1:bw*i]),
+        .reset    (reset));
   end
 
 
@@ -45,10 +45,10 @@ module l0 (clk, in, out, rd, wr, o_full, reset, o_ready);
    end
    else
 	`ifdef L0_GLOBAL_READ
-      	// version1: read all row at a time
+  // version1: read all row at a time
       		rd_en <= {row{rd}};
-        `else
-      	//version2: read 1 row at a time
+  `else
+  //version2: read 1 row at a time
 		rd_en[0] <= rd;
 		rd_en[1] <= rd_en[0];
 		rd_en[2] <= rd_en[1];
