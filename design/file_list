@@ -3,8 +3,8 @@
 ./verilog/common_ip/fifo_mux_16_1.v
 ./verilog/common_ip/fifo_depth8.v
 ./verilog/common_ip/fifo_depth64.v
-../individual_files/Shail/l0.v
-../individual_files/Shail/ofifo.v
+./verilog/L0/l0.v
+./verilog/OFIFO/ofifo.v
 ./verilog/PE_array/mac.v
 ./verilog/PE_array/mac_tile.v
 ./verilog/PE_array/mac_row.v
@@ -13,4 +13,4 @@
 ./verilog/memories/xmem_2048x32.v
 ./verilog/memories/pmem_16384x128.v
 ./verilog/core.v
-./verilog/PE_array/sfu.v
+./verilog/SFU/sfu.v
