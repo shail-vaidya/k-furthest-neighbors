@@ -17,7 +17,7 @@ module mac_row (clk, out_s, in_w, in_n, valid, inst_w, reset);
   wire  [(col+1)*3-1:0] temp_inst;
 
   assign temp[bw-1:0]   = in_w;
-  assign temp[2:0]   = inst_w;
+  assign temp_inst[2:0]   = inst_w;
 
   genvar i;
   for (i=1; i < col+1 ; i=i+1) begin : col_num
