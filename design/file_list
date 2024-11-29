@@ -13,3 +13,4 @@
 ./verilog/memories/sram0_2048x32.v
 ./verilog/memories/sram1_2048x128.v
 ./verilog/core.v
+./verilog/PE_array/sfu.v
