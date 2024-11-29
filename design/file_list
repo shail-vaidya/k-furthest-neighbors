@@ -6,7 +6,7 @@
 ./verilog/L0/l0.v
 ./verilog/OFIFO/ofifo.v
 ./verilog/PE_array/mac.v
-./verilog/PE_array/mac_tile.v
+./verilog/PE_array/reconf_mac_tile.v
 ./verilog/PE_array/mac_row.v
 ./verilog/PE_array/mac_array.v
 ./verilog/corelet.v

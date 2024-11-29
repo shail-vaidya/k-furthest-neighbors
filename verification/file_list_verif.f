@@ -6,7 +6,7 @@
 ../design/verilog/L0/l0.v
 ../design/verilog/OFIFO/ofifo.v
 ../design/verilog/PE_array/mac.v
-../design/verilog/PE_array/mac_tile.v
+../design/verilog/PE_array/reconf_mac_tile.v
 ../design/verilog/PE_array/mac_row.v
 ../design/verilog/PE_array/mac_array.v
 ../design/verilog/SFU/sfu.v
