@@ -16,20 +16,22 @@ module core #(
     input                       reset,
     input                       ofifo_valid,
     input   [bw*row-1:0]        D_xmem,
-    input   [34:0]              inst,
+    input   [49:0]              inst,
     output  [psum_bw*col-1:0]   sfp_out
 );
 
 //***********************************************
 //        Instruction Mapping
 //***********************************************
-//  inst[34]      = acc_q;
-//  inst[33]      = CEN_pmem_q;
-//  inst[32]      = WEN_pmem_q;
-//  inst[31:21]   = A_pmem_q;
-//  inst[20]      = CEN_xmem_q;
-//  inst[19]      = WEN_xmem_q;
-//  inst[18:8]    = A_xmem_q;
+//  inst[49]      = acc_q;
+//  inst[48]      = CEN_pmem_q;
+//  inst[47]      = WEN_pmem_q;
+//  inst[46:33]   = A_pmem_q;
+//  inst[32]      = CEN1_xmem_q;
+//  inst[31:21]    = A1_xmem_q;
+//  inst[20]      = CEN0_xmem_q;
+//  inst[19]      = WEN0_xmem_q;
+//  inst[18:8]    = A0_xmem_q;
 //  inst[7]       = ofifo_rd_q;
 //  inst[6]       = ififo_wr_q;
 //  inst[5]       = ififo_rd_q;
@@ -43,17 +45,12 @@ module core #(
 //                          Wires
 //*************************************************************
 wire [psum_bw*col-1:0] ofifo_rdata;
-wire [bw*row-1:0] l0_wdata;
-wire [bw*row-1:0] ififo_wdata;
-wire [bw*row-1:0] Q_xmem;
+wire [bw*row-1:0] Q0_xmem;
+wire [bw*row-1:0] Q1_xmem;
 
 //*************************************************************
 //                          Misc Logic
 //*************************************************************
-
-// Muxing for SRAM0 to L0/IFIFO
-assign l0_wdata     = inst[2] ? {bw*row{1'b0}} : Q_xmem;
-assign ififo_wdata  = inst[2] ? Q_xmem : {bw*row{1'b0}};
 
 //*************************************************************
 //                      Corelet Instance
@@ -76,11 +73,11 @@ corelet #(
     // L0 Ports
     .l0_rd              (inst[4]),
     .l0_wr              (inst[3]),
-    .l0_wdata           (l0_wdata),
+    .l0_wdata           (Q0_xmem),
     // IFIFO Ports
     .ififo_rd           (inst[5]),
     .ififo_wr           (inst[6]),
-    .ififo_wdata        (ififo_wdata),
+    .ififo_wdata        (Q1_xmem),
     // SFP Ports
     .sfp_out            (sfp_out)
 );
@@ -88,24 +85,29 @@ corelet #(
 //*************************************************************
 //                      SRAM0 Instance
 //*************************************************************
-sram0_2048x32 SRAM0_inst (
+xmem_2048x32 xmem_inst (
     .CLK    (clk),        
-    .WEN    (inst[19]),
-    .CEN    (inst[20]),
-    .D      (D_xmem),  
-    .A      (inst[17:7]),  
-    .Q      (Q_xmem)
+    .WEN0    (inst[19]),
+    .CEN0    (inst[20]),
+    .D0      (D_xmem),  
+    .A0      (inst[18:8]),  
+    .Q0      (Q0_xmem),
+    .WEN1    (1'b1),    // Tied high so that Port1 can be used only for reading
+    .CEN1    (inst[32]),
+    .D1      (),  
+    .A1      (inst[31:21]),  
+    .Q1      (Q1_xmem)
 );
 //*************************************************************
 //                      SRAM1 Instance
 //*************************************************************
-sram1_2048x128 SRAM1_inst (
+pmem_16384x128 pmem_inst (
     .CLK    (clk),        
-    .WEN    (inst[32]),
-    .CEN    (inst[33]),
+    .WEN    (inst[47]),
+    .CEN    (inst[48]),
     .D      (ofifo_rdata),  
-    .A      (inst[31:21]),  
-    .Q      ()     //TODO connecting SRAM1 to SFP
+    .A      (inst[46:33]),  
+    .Q      ()     //TODO connecting pmem to SFP
 );
 
 endmodule

@@ -10,6 +10,6 @@
 ./verilog/PE_array/mac_row.v
 ./verilog/PE_array/mac_array.v
 ./verilog/corelet.v
-./verilog/memories/sram0_2048x32.v
-./verilog/memories/sram1_2048x128.v
+./verilog/memories/xmem_2048x32.v
+./verilog/memories/pmem_16384x128.v
 ./verilog/core.v
