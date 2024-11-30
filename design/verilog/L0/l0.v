@@ -17,16 +17,18 @@ module l0 (clk, in, out, rd, wr, o_full, reset, o_ready);
 
   wire [row-1:0]      empty;
   wire [row-1:0]      full;
-  reg  [row-1:0]      rd_en;
+  reg  [row-1:0]      rd_q;
+  wire [row-1:0]      rd_en;
   
   genvar i;
 
-  assign o_ready = ~o_full ;
-  assign o_full  = |full ;
-
+  assign o_ready = ~o_full;
+  assign o_full  = |full;
+  assign rd_en[row-1:1] = rd_q[row-1:1];
+  assign rd_en[0] = rd;
 
   for (i=0; i<row ; i=i+1) begin : row_num
-      fifo_depth64 #(.bw(bw)) fifo_instance (
+      fifo_depth16 #(.bw(bw)) fifo_instance (
 	      .rd_clk   (clk),
 	      .wr_clk   (clk),
 	      .rd       (rd_en[i]),
@@ -41,7 +43,7 @@ module l0 (clk, in, out, rd, wr, o_full, reset, o_ready);
 
   always @ (posedge clk or posedge reset) begin
    if (reset) begin
-      rd_en <= 8'b00000000;
+      rd_q <= 8'b00000000;
    end
    else
 	`ifdef L0_GLOBAL_READ
@@ -49,14 +51,13 @@ module l0 (clk, in, out, rd, wr, o_full, reset, o_ready);
       		rd_en <= {row{rd}};
   `else
   //version2: read 1 row at a time
-		rd_en[0] <= rd;
-		rd_en[1] <= rd_en[0];
-		rd_en[2] <= rd_en[1];
-		rd_en[3] <= rd_en[2];
-		rd_en[4] <= rd_en[3];
-		rd_en[5] <= rd_en[4];
-		rd_en[6] <= rd_en[5];
-		rd_en[7] <= rd_en[6];
+		rd_q[1] <= rd;
+		rd_q[2] <= rd_q[1];
+		rd_q[3] <= rd_q[2];
+		rd_q[4] <= rd_q[3];
+		rd_q[5] <= rd_q[4];
+		rd_q[6] <= rd_q[5];
+		rd_q[7] <= rd_q[6];
 	`endif	
     end
 

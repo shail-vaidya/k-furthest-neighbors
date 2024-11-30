@@ -28,10 +28,12 @@ module corelet #(
     input                       l0_rd,
     input                       l0_wr,
     input   [bw*row-1:0]        l0_wdata,
+    output                      l0_ready,
     // IFIFO Ports
     input                       ififo_rd,
     input                       ififo_wr,
     input   [bw*row-1:0]        ififo_wdata,
+    output                      ififo_ready,
     // SFP Ports
     input   [psum_bw*col-1:0]        sfp_psum_i,
     input                            sfp_acc_i,
@@ -91,7 +93,7 @@ l0 #(
     .in         (l0_wdata),
     .out        (l0_rdata),
     .o_full     (),             // Unused
-    .o_ready    ()              // Unused
+    .o_ready    (l0_ready)              // Unused
 );
 
 //*************************************************************
@@ -108,7 +110,7 @@ l0 #(
     .in         (ififo_wdata),
     .out        (ififo_rdata),
     .o_full     (),             // Unused
-    .o_ready    ()              // Unused
+    .o_ready    (ififo_ready)              // Unused
 );
 
 //*************************************************************

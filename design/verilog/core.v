@@ -14,9 +14,11 @@ module core #(
 ) (
     input                       clk,
     input                       reset,
-    output                       ofifo_valid,
     input   [bw*row-1:0]        D_xmem,
     input   [49:0]              inst,
+    output                      ofifo_valid,
+    output                      l0_ready,
+    output                      ififo_ready,
     output  [psum_bw*col-1:0]   sfp_out
 );
 
@@ -76,10 +78,12 @@ corelet #(
     .l0_rd              (inst[4]),
     .l0_wr              (inst[3]),
     .l0_wdata           (Q0_xmem),
+    .l0_ready           (l0_ready),
     // IFIFO Ports
     .ififo_rd           (inst[5]),
     .ififo_wr           (inst[6]),
     .ififo_wdata        (Q1_xmem),
+    .ififo_ready        (ififo_ready),
     // SFP Ports
     .sfp_acc_i          (inst[49]),
     .sfp_psum_i         (sfu_i_data),
