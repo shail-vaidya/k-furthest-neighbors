@@ -47,7 +47,7 @@ always @ (posedge clk) begin
 		shift_ready_q 	<= 1'b1;
 	end
 	else begin
-		inst_q[1] <= inst_w[1]; // Always flop the lower 2bits of the instruction
+		inst_q[2:1] <= inst_w[2:1]; // Always flop the lower 2bits of the instruction
 
 		if (~inst_w[2]) begin	// Weight Stationary
 			if(inst_w[0] || inst_w[1]) begin
@@ -65,12 +65,12 @@ always @ (posedge clk) begin
 			end
 		end
 		else begin	// Output Stationary
-			inst_q <= inst_w[0];
+			inst_q[0] <= inst_w[0];
 			if(inst_w[1:0] == 2'b10) begin // O_EXEC
 				a_q <= in_w;
 				b_q <= in_n[3:0];
 			end
-			if(inst_w[1:0] == 2'b01) begin // O_SHIFT
+			else if(inst_w[1:0] == 2'b01) begin // O_SHIFT
 				c_pipe_q <= in_n;
 				if (shift_ready_q) begin
 					shift_ready_q <= 1'b0;
@@ -79,13 +79,18 @@ always @ (posedge clk) begin
 					c_q <= c_pipe_q;
 				end
 			end
-			if (inst_w[1:0] == 2'b11) begin // RESET
+			else if (inst_w[1:0] == 2'b11) begin // RESET
 				a_q 		<= {bw{1'b0}};
 				b_q 		<= {bw{1'b0}};
 				c_q 		<= {psum_bw{1'b0}};
 				c_pipe_q 	<= {psum_bw{1'b0}};
+				load_ready_q <= 1'b1;
+				shift_ready_q <= 1'b1;
 			end
 
+		end
+		if (inst_q == 3'b110) begin
+			c_q <= mac_out;
 		end
 	end
 
