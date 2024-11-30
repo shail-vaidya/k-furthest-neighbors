@@ -63,6 +63,7 @@ reg [8*30:1] stringvar;
 reg [8*30:1] w_file_name;
 wire ofifo_valid;
 wire [col*psum_bw-1:0] sfp_out;
+wire l0_ready;
 
 integer x_file, x_scan_file ; // file_handler
 integer w_file, w_scan_file ; // file_handler
@@ -132,6 +133,7 @@ core  #(.bw(bw), .col(col), .row(row)) core_instance (
 	.ofifo_valid(ofifo_valid),
         .D_xmem(D_xmem_q), 
         .sfp_out(sfp_out), 
+        .l0_ready(l0_ready),
 	.reset(reset)); 
 
 
@@ -263,7 +265,7 @@ initial begin
     /////// Kernel/Act loading to PEs and act writing to L0///////
     
     //SRAM read begins for actmem;
-    #0.5 clk = 1'b0; WEN0_xmem = 1; CEN0_xmem = 0; A0_xmem  = 0;
+    #0.5 clk = 1'b0; WEN0_xmem = 1; CEN0_xmem = 0; A0_xmem  = 0; l0_wr=0; 
     #0.5 clk = 1'b1;    
  
     //SRAM read continues; L0 act write begins; L0 wgt read begins; Load instruction begins
