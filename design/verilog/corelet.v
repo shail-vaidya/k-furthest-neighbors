@@ -35,7 +35,9 @@ module corelet #(
     input   [bw*row-1:0]        ififo_wdata,
     output                      ififo_ready,
     // SFP Ports
-    output  [psum_bw*col-1:0]   sfp_out
+    input   [psum_bw*col-1:0]        sfp_psum_i,
+    input                            sfp_acc_i,
+    output  [psum_bw*col-1:0]        sfp_out
 );
 
 //*************************************************************
@@ -50,7 +52,6 @@ wire [bw*row-1:0]       l0_rdata;
 //*************************************************************
 //                      Stubbing (To be removed)
 //*************************************************************
-assign sfp_out = {psum_bw*col{1'b0}};
 
 //*************************************************************
 //                      Misc  Logic
@@ -131,8 +132,22 @@ ofifo #(
 );
 
 //*************************************************************
-//                  Special Function Processor (To be added)
+//                  Special Function Processor 
 //*************************************************************
+sfu #(
+    .bw     (4),
+    .psum_bw(16),
+    .col    (8),
+    .row    (8)
+) sfu_inst (
+    .clk        (clk),
+    .reset      (reset),
+    .acc_i      (sfp_acc_i),
+    .mode_i     (1'b0), // TODO Connect mode logic
+    .psum_in    (sfp_psum_i),
+    .psum_out   (sfp_out)
+);
+
 
 endmodule
 
