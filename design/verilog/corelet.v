@@ -54,8 +54,8 @@ assign sfp_out = {psum_bw*col{1'b0}};
 //                      Misc  Logic
 //*************************************************************
 genvar i;
-    for (i=1; i < col ; i=i+1) begin
-        assign in_n[psum_bw*i+bw-1:psum_bw*i] = ififo_rdata[bw*(i+1)-1:bw*i];
+    for (i=0; i < col ; i=i+1) begin
+        assign in_n[psum_bw*(i+1)-1:psum_bw*i] = {{(psum_bw-bw){1'b0}},ififo_rdata[bw*(i+1)-1:bw*i]};
     end
 
 //*************************************************************
