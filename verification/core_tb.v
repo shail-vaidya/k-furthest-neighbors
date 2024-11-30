@@ -11,13 +11,12 @@ parameter len_onij = 16;
 parameter col = 8;
 parameter row = 8;
 //FIXME: Reducing len nij to take only 16 inputs first
-parameter len_nij = 16;
+parameter len_nij = 1024;
 
-reg clk = 0;
+reg clk = 1;
 reg reset = 1;
 //FIXME: Why was this updated to 50?
 wire [49:0] inst_q; 
-
 reg [1:0]  inst_w_q = 0; 
 reg [bw*row-1:0] D_xmem_q = 0;
 reg CEN0_xmem = 1;
@@ -42,8 +41,14 @@ reg ififo_rd_q = 0;
 reg l0_rd_q = 0;
 reg l0_wr_q = 0;
 reg execute_q = 0;
+reg execute_s1_q = 0;
+reg execute_s2_q = 0;
 reg load_q = 0;
+reg load_s1_q = 0;
+reg load_s2_q = 0;
 reg mode_q = 0;
+reg mode_s1_q = 0;
+reg mode_s2_q = 0;
 reg acc_q = 0;
 reg acc = 0;
 
@@ -57,6 +62,7 @@ reg ififo_wr;
 reg ififo_rd;
 reg l0_rd;
 reg l0_wr;
+reg mode;
 reg execute;
 reg load;
 reg [8*30:1] stringvar;
@@ -64,6 +70,7 @@ reg [8*30:1] w_file_name;
 wire ofifo_valid;
 wire [col*psum_bw-1:0] sfp_out;
 wire l0_ready;
+wire ififo_ready;
 
 integer x_file, x_scan_file ; // file_handler
 integer w_file, w_scan_file ; // file_handler
@@ -91,40 +98,23 @@ integer error;
 //  inst[1]       = execute_q; 
 //  inst[0]       = load_q;
 
-
-//assign inst_q[34] = acc_q;
-//assign inst_q[33] = CEN_pmem_q;
-//assign inst_q[32] = WEN_pmem_q;
-//assign inst_q[31:21] = A_pmem_q;
-//assign inst_q[20]   = CEN_xmem_q;
-//assign inst_q[19]   = WEN_xmem_q;
-//assign inst_q[18:8] = A_xmem_q;
-//assign inst_q[7]   = ofifo_rd_q;
-//assign inst_q[6]   = ififo_wr_q;
-//assign inst_q[5]   = ififo_rd_q;
-//assign inst_q[4]   = l0_rd_q;
-//assign inst_q[3]   = l0_wr_q;
-//assign inst_q[2]   = mode_q; 
-//assign inst_q[1]   = execute_q; 
-//assign inst_q[0]   = load_q;
- 
-assign inst_q[49] 	= acc_q;
-assign inst_q[48] 	= CEN_pmem_q;
-assign inst_q[47] 	= WEN_pmem_q;
+assign inst_q[49] 	  = acc_q;
+assign inst_q[48] 	  = CEN_pmem_q;
+assign inst_q[47] 	  = WEN_pmem_q;
 assign inst_q[46:33] 	= A_pmem_q;
-assign inst_q[32] 	= CEN1_xmem_q;
+assign inst_q[32] 	  = CEN1_xmem_q;
 assign inst_q[31:21] 	= A1_xmem_q;
 assign inst_q[20]   	= CEN0_xmem_q;
 assign inst_q[19]   	= WEN0_xmem_q;
 assign inst_q[18:8] 	= A0_xmem_q;
-assign inst_q[7]  	= ofifo_rd_q;
-assign inst_q[6]  	= ififo_wr_q;
-assign inst_q[5]  	= ififo_rd_q;
-assign inst_q[4]  	= l0_rd_q;
-assign inst_q[3]  	= l0_wr_q;
-assign inst_q[2]  	= mode_q; 
-assign inst_q[1]  	= execute_q; 
-assign inst_q[0]  	= load_q; 
+assign inst_q[7]  	  = ofifo_rd_q;
+assign inst_q[6]  	  = ififo_wr_q;
+assign inst_q[5]  	  = ififo_rd_q;
+assign inst_q[4]  	  = l0_rd_q;
+assign inst_q[3]  	  = l0_wr_q;
+assign inst_q[2]  	  = mode_q; 
+assign inst_q[1]  	  = execute_q; 
+assign inst_q[0]  	  = load_q; 
 
 
 core  #(.bw(bw), .col(col), .row(row)) core_instance (
@@ -132,10 +122,12 @@ core  #(.bw(bw), .col(col), .row(row)) core_instance (
 	.inst(inst_q),
 	.ofifo_valid(ofifo_valid),
         .D_xmem(D_xmem_q), 
-        .sfp_out(sfp_out), 
-        .l0_ready(l0_ready),
-	.reset(reset)); 
+        .sfp_out(sfp_out),
+        .l0_ready (l0_ready),
+        .ififo_ready  (ififo_ready), 
+	.reset(reset));
 
+always #0.5 clk = ~clk;
 
 initial begin 
 
@@ -151,6 +143,7 @@ initial begin
   ififo_rd = 0;
   l0_rd    = 0;
   l0_wr    = 0;
+  mode     = 0;
   execute  = 0;
   load     = 0;
 
@@ -164,48 +157,40 @@ initial begin
   x_scan_file = $fscanf(x_file,"%s", captured_data);
   x_scan_file = $fscanf(x_file,"%s", captured_data);
 
-  //////// Reset /////////
-  #0.5 clk = 1'b0;   reset = 1;
-  #0.5 clk = 1'b1; 
+  //-------------- Reset --------------
+  #0.5 
+  reset = 1;
+  #10
+  reset = 0;
+  #2 
+  //-----------------------------------
 
-  for (i=0; i<10 ; i=i+1) begin
-    #0.5 clk = 1'b0;
-    #0.5 clk = 1'b1;  
-  end
-
-  #0.5 clk = 1'b0;   reset = 0;
-  #0.5 clk = 1'b1; 
-
-  #0.5 clk = 1'b0;   
-  #0.5 clk = 1'b1;   
-  /////////////////////////
-
-  /////// Activation data writing to memory ///////
+  //----------------------------------- Activation data writing to memory ------------------------------------------
   for (t=0; t<len_nij; t=t+1) begin  
-    #0.5 clk = 1'b0;  x_scan_file = $fscanf(x_file,"%32b", D_xmem); WEN0_xmem = 0; CEN0_xmem = 0; if (t>0) A0_xmem = A0_xmem + 1;
-    #0.5 clk = 1'b1;   
+    #1 x_scan_file = $fscanf(x_file,"%32b", D_xmem); WEN0_xmem = 0; CEN0_xmem = 0; if (t>0) A0_xmem = A0_xmem + 1;   
   end
 
-  #0.5 clk = 1'b0;  WEN0_xmem = 1;  CEN0_xmem = 1; A0_xmem = 0; 
-  #0.5 clk = 1'b1; 
+  #1 WEN0_xmem = 1;  CEN0_xmem = 1; A0_xmem = 0;
+  #5 
 
   $fclose(x_file);
-  /////////////////////////////////////////////////
+  //-----------------------------------------------------------------------------------------------------------------
 
 
-  for (kij=0; kij<1; kij=kij+1) begin  // kij loop
+  for (kij=0; kij<2; kij=kij+1) begin  // Weight loading to SRAM loop
 
     case(kij)
      0: w_file_name = "weight.txt"; //all ic and oc; 32 bits = 4*(rows)
-//     0: w_file_name = "weight_itile0_otile0_kij0.txt"; //all ic and oc; 32 bits = 4*(rows)
-//     1: w_file_name = "weight_itile0_otile0_kij1.txt";
-//     2: w_file_name = "weight_itile0_otile0_kij2.txt";
-//     3: w_file_name = "weight_itile0_otile0_kij3.txt";
-//     4: w_file_name = "weight_itile0_otile0_kij4.txt";
-//     5: w_file_name = "weight_itile0_otile0_kij5.txt";
-//     6: w_file_name = "weight_itile0_otile0_kij6.txt";
-//     7: w_file_name = "weight_itile0_otile0_kij7.txt";
-//     8: w_file_name = "weight_itile0_otile0_kij8.txt";
+     1: w_file_name = "weight.txt"; //all ic and oc; 32 bits = 4*(rows)
+  //   0: w_file_name = "weight_itile0_otile0_kij0.txt"; //all ic and oc; 32 bits = 4*(rows)
+  //   1: w_file_name = "weight_itile0_otile0_kij1.txt";
+  //   2: w_file_name = "weight_itile0_otile0_kij2.txt";
+  //   3: w_file_name = "weight_itile0_otile0_kij3.txt";
+  //   4: w_file_name = "weight_itile0_otile0_kij4.txt";
+  //   5: w_file_name = "weight_itile0_otile0_kij5.txt";
+  //   6: w_file_name = "weight_itile0_otile0_kij6.txt";
+  //   7: w_file_name = "weight_itile0_otile0_kij7.txt";
+  //   8: w_file_name = "weight_itile0_otile0_kij8.txt";
     endcase
     
 
@@ -215,113 +200,64 @@ initial begin
     w_scan_file = $fscanf(w_file,"%s", captured_data);
     w_scan_file = $fscanf(w_file,"%s", captured_data);
 
-    #0.5 clk = 1'b0;   reset = 1;
-    #0.5 clk = 1'b1; 
+    //---------------------------------- Kernel data writing to memory --------------------------------------------------
 
-    for (i=0; i<10 ; i=i+1) begin
-      #0.5 clk = 1'b0;
-      #0.5 clk = 1'b1;  
-    end
-
-    #0.5 clk = 1'b0;   reset = 0;
-    #0.5 clk = 1'b1; 
-
-    #0.5 clk = 1'b0;   
-    #0.5 clk = 1'b1;   
-
-
-    /////// Kernel data writing to memory ///////
-
-    A0_xmem = 11'b10000000000;
     for (t=0; t<col; t=t+1) begin  //iterating over all cols (oc)
-      #0.5 clk = 1'b0;  w_scan_file = $fscanf(w_file,"%32b", D_xmem); WEN0_xmem = 0; CEN0_xmem = 0; if (t>0) A0_xmem = A0_xmem + 1; 
-      #0.5 clk = 1'b1;  
+      #1 w_scan_file = $fscanf(w_file,"%32b", D_xmem); WEN0_xmem = 0; CEN0_xmem = 0; 
+      if (t==0) begin 
+        A0_xmem = 11'b10000000000 + kij*11'h8;
+      end
+      else if (t>0) A0_xmem = A0_xmem + 1;  
     end
+    //------------------------------------------------------------------------------------------------------------------
 
-    #0.5 clk = 1'b0;  WEN0_xmem = 1;  CEN0_xmem = 1; A0_xmem = 0;
-    #0.5 clk = 1'b1; 
-    /////////////////////////////////////
+  end // end of Weight loading to SRAM loop
 
+  #1 WEN0_xmem = 1;  CEN0_xmem = 1;
+  #1
 
-    /////// Kernel data writing to L0 ///////
-    
-    //SRAM read begins for wgtmem;
-    #0.5 clk = 1'b0; WEN0_xmem = 1; CEN0_xmem = 0; A0_xmem = 11'b10000000000;
-    #0.5 clk = 1'b1; 
+  for (kij=0; kij<2; kij=kij+1) begin
 
-    //SRAM read continues; L0 wgt write begins;
-    for (t=0; t<col - 1; t=t+1) begin  		//FIXME:o_full needs to be added ; 7th row is getting populated first. should we reverse it?
-      #0.5 clk = 1'b0; WEN0_xmem = 1; CEN0_xmem = 0; A0_xmem = A0_xmem + 1; l0_wr=1; 
-      #0.5 clk = 1'b1; 
-    end
+    // -------------------------- Load and Execute ---------------------------------------------------
+      t = col + len_nij;
+      while (t > 0) begin
+        if(l0_ready) begin
+          #1;
+          CEN0_xmem = 0;
+          WEN0_xmem = 1;
+          if (t == (col+len_nij))
+            A0_xmem = 11'h400 + kij*11'h8;
+          if (t == len_nij) begin
+            A0_xmem = 11'h0;
+          end
+          else if (t < (col+len_nij)) begin
+            A0_xmem = A0_xmem + 1;
+          end
+          if (t > len_nij) begin
+            mode = 0;
+            execute = 0;
+            load = 1;
+          end
+          else begin
+            load = 0;
+            execute = 1;
+          end
+          t = t - 1;
+        end
+        else begin
+          #1
+          CEN0_xmem = 1;
+          WEN0_xmem = 1;
+        end
+      end
 
-    //SRAM read ends; last L0 wgt write issued;
-    #0.5 clk = 1'b0; WEN0_xmem = 1; CEN0_xmem = 1; A0_xmem = 0; l0_wr=1; 
-    #0.5 clk = 1'b1;  
-
-    /////////////////////////////////////
-
-
-    /////// Kernel/Act loading to PEs and act writing to L0///////
-    
-    //SRAM read begins for actmem;
-    #0.5 clk = 1'b0; WEN0_xmem = 1; CEN0_xmem = 0; A0_xmem  = 0; l0_wr=0; 
-    #0.5 clk = 1'b1;    
- 
-    //SRAM read continues; L0 act write begins; L0 wgt read begins; Load instruction begins
-    for (t=0; t<col; t=t+1) begin		//FIXME:o_full needs to be added ; 7th row is getting populated first. should we reverse it?
-      #0.5 clk = 1'b0; WEN0_xmem = 1; CEN0_xmem = 0; A0_xmem = A0_xmem + 1; l0_wr=1; l0_rd = 1; load = 1; execute = 0;	//set l0_rd, l0_wr and load PE
-      #0.5 clk = 1'b1;
-    end
-
-    //SRAM read continues; L0 act write continues; L0 act read begins; Execute instruction begins
-    for (t=0; t<len_nij - col - 1; t=t+1) begin	//FIXME:o_full needs to be added ; 7th row is getting populated first. should we reverse it?
-      #0.5 clk = 1'b0; WEN0_xmem = 1; CEN0_xmem = 0; A0_xmem = A0_xmem + 1; l0_wr=1; l0_rd = 1; load = 0; execute = 1;	//set l0_rd, l0_wr and execute PE
-      #0.5 clk = 1'b1;
-    end
-
-    //SRAM read ends; last L0 act write issues; L0 act read continues; Excute instruction continues; SRAM turns off
-      #0.5 clk = 1'b0; WEN0_xmem = 1;  CEN0_xmem = 1; A0_xmem = 0; l0_wr=1; l0_rd = 1; load = 0; execute = 1;
-      #0.5 clk = 1'b1;
- 
-    /////////////////////////////////////
-  
-
-    /////// Last 8 act loading to PE ///////
-
-    //L0 act read continues; Execute instruction continues;
-    for (t=0; t<col; t=t+1) begin		//FIXME:o_full needs to be added ; 7th row is getting populated first. should we reverse it?
-      #0.5 clk = 1'b0; l0_wr=0; l0_rd = 1; load = 0; execute = 1;	//set l0_rd and execute PE
-      #0.5 clk = 1'b1; 
-    end
-      #0.5 clk = 1'b0; l0_wr = 0; l0_rd = 0; load = 0; execute = 0;	//clear inst_w and in_w
-      #0.5 clk = 1'b1; 
-    /////////////////////////////////////
-
-    ////// provide some intermission to clear up the kernel loading ///
-    #0.5 clk = 1'b0;  load = 0; l0_rd = 0;
-    #0.5 clk = 1'b1;  
-  
-
-    for (i=0; i<10 ; i=i+1) begin
-      #0.5 clk = 1'b0;
-      #0.5 clk = 1'b1;  
-    end
-    /////////////////////////////////////
-
-
-
-    /////// Activation data writing to L0 ///////
-    //...
-    /////////////////////////////////////
-
-
-
-    /////// Execution ///////
-    //...
-    /////////////////////////////////////
-
-
+      #1
+      load = 1;
+      execute = 1;
+      mode = 1;
+      CEN0_xmem = 1;
+      WEN0_xmem = 1;
+  end
 
     //////// OFIFO READ ////////
     // Ideally, OFIFO should be read while execution, but we have enough ofifo
@@ -330,7 +266,7 @@ initial begin
     /////////////////////////////////////
 
 
-  end  // end of kij loop
+
 
 //COMMENTING OUT BELOW TB FOR NOW//
 
@@ -401,7 +337,7 @@ initial begin
 //    #0.5 clk = 1'b1;  
 //  end
 //
-//  #10 $finish;
+#100 $finish;
 //
 end
 
@@ -422,8 +358,23 @@ always @ (posedge clk) begin
    ififo_rd_q <= ififo_rd;
    l0_rd_q    <= l0_rd;
    l0_wr_q    <= l0_wr ;
-   execute_q  <= execute;
-   load_q     <= load;
+
+   mode_s1_q  <= mode;
+   mode_s2_q  <= mode_s1_q;
+   load_s1_q  <= load;
+   load_s2_q  <= load_s1_q;
+   execute_s1_q  <= execute;
+   execute_s2_q  <= execute_s1_q;
+
+   mode_q     <= mode_s2_q;
+   execute_q  <= execute_s2_q;
+   load_q     <= load_s2_q;
+end
+
+always @(negedge clk ) begin
+  l0_wr <= ~CEN0_xmem_q && WEN0_xmem_q;
+  ififo_wr <= ~CEN1_xmem_q;
+  l0_rd <= l0_wr; 
 end
 
 
