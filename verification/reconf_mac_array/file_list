@@ -1,0 +1,6 @@
+../../design/verilog/PE_array/mac.v
+../../design/verilog/PE_array/reconf_mac_tile.v
+../../design/verilog/PE_array/mac_row.v
+../../individual_files/Shail/mac_array.v
+./reconf_mac_array_tb.v
+

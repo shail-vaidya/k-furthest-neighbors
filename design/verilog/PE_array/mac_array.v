@@ -9,63 +9,60 @@ module mac_array (clk, reset, out_s, in_w, in_n, inst_w, valid);
 
   input  clk, reset;
   output [psum_bw*col-1:0] out_s;
-  input  [row*bw-1:0] in_w; // inst[1]:execute, inst[0]: kernel loading
-  input  [2:0] inst_w;
+  input  [row*bw-1:0] in_w;
+  input  [2:0] inst_w;  	// inst[2]:mode, inst[1]:execute, inst[0]: kernel loading
   input  [psum_bw*col-1:0] in_n;
   output [col-1:0] valid;
 
-  //My code begins
-  reg [(row+1)*3-1:0] inst_temp;
-  wire	[(row+1)*psum_bw*col-1:0] in_n_temp;
+  wire [row*col-1:0] temp_valid;	// Wires for connecting the valid signals of each row
+  wire [psum_bw*col*(row+1)-1:0] temp;
+  wire [3*row-1:0] temp_inst_in; 	// Wires to connect to input of temp_inst_q registers
+  wire [3*row-1:0] temp_inst_out;
 
-  //in_n gets populated from first psum_bw*col portion of temp register
-  assign in_n_temp[psum_bw*col-1:0] = in_n;
-  //out_s gets generated from last psum_bw*col portion of temp register
-  assign out_s = in_n_temp[(row+1)*psum_bw*col-1:row*psum_bw*col];
-
-  //Give a staggered input to each row
-  always @ (posedge clk) begin
-	  if (reset) begin
-		  inst_temp <= 0;
-	  end else begin
-		  inst_temp <= inst_temp << 3 | inst_w;
-	  end
-  end
-  
-  genvar i;		
+  genvar i;
   for (i=1; i < row+1 ; i=i+1) begin : row_num
-	if (i<row) begin
-		mac_row #(.bw(bw), .psum_bw(psum_bw)) mac_row_instance (
-	      	  .clk(clk),
-		  //bits[31*col:16*col] of in_n_temp and increments by 16*col for each row
-	      	  .out_s(in_n_temp[(i+1)*psum_bw*col-1:i*psum_bw*col]), 
-		  //block in_w input given to array, divided for each row
-	      	  .in_w(in_w[bw*i-1:bw*(i-1)]), 
-		  //bits[16*col:0] of in_n_temp and increments by 16*col for each row
-	     	  .in_n(in_n_temp[psum_bw*i*col-1:psum_bw*col*(i-1)]),
-		  //Leave this output hanging for each non terminal row
-	      	  .valid(), 
-		  //bits[1:0] of inst_temp and increments by 2 each row
-	      	  .inst_w(inst_temp[3*i-1:3*(i-1)]), 
-	      	  .reset(reset)
-      		);
+      mac_row #(.bw(bw), .psum_bw(psum_bw)) mac_row_instance (
+      	.clk (clk),
+      	.reset (reset),
+	      .inst_w(temp_inst_out[3*i-1:3*(i-1)]),
+	      .in_w(in_w[bw*i-1:bw*(i-1)]),
+	      .in_n(temp[psum_bw*col*i-1:psum_bw*col*(i-1)]),
+	      .out_s(temp[psum_bw*col*(i+1)-1:psum_bw*col*i]),
+	      .valid(temp_valid[col*i-1:col*(i-1)])
+      );
+  end
+
+
+  assign out_s = temp[psum_bw*col*(row+1)-1:psum_bw*col*row];	// Taking out_s of the last row as the final outputs of the mac_array 
+  assign temp[psum_bw*col-1:0] = in_n[psum_bw*col-1:0];
+
+  assign valid = temp_valid[row*col-1:(row-1)*col];		// Taking valids of the last row as the final valids for the columns of mac_array
+
+
+  // ------------------------------------------------------------------------------------------------------------------------------------------------
+  // Note: The below code might look complicated but is implemented in
+  // order to maintain the parameterization of mac_array and not hard_code any
+  // of the rows/column numbers
+
+  reg  [3*row-1:0] temp_inst_q;		// Registers to pipe intructions from north to south for rows 	
+  					// Note: temp_inst_q[1:0] not used as first row gets direct instruction
+
+  always @ (posedge clk) begin
+   // inst_w flows to row0 to row7
+  	if(reset) begin
+		temp_inst_q <= {3*(row-1){1'b0}};		// Initialing all the instruction pipe registers to 0.
 	end
-	if (i==row) begin
-		mac_row #(.bw(bw), .psum_bw(psum_bw)) mac_row_instance (
-	      	  .clk(clk),
-		  //bits[31*col:16*col] of in_n_temp and increments by 16*col for each row
-	      	  .out_s(in_n_temp[(i+1)*psum_bw*col-1:i*psum_bw*col]), 
-		  //block in_w input given to array, divided for each row
-	      	  .in_w(in_w[bw*i-1:bw*(i-1)]), 
-		  //bits[16*col:0] of in_n_temp and increments by 16*col for each row
-	     	  .in_n(in_n_temp[psum_bw*i*col-1:psum_bw*col*(i-1)]),
-		  //Only connect this output of the terminal row to output valid
-	      	  .valid(valid), 
-		  //bits[1:0] of inst_temp and increments by 2 each row
-	      	  .inst_w(inst_temp[3*i-1:3*(i-1)]), 
-	      	  .reset(reset)
-      		);
+	else begin
+		temp_inst_q <= temp_inst_in;			// Connecting all the input wires to temp_inst_q
 	end
+  end
+
+  assign temp_inst_out[2:0] = inst_w[2:0];		// Connecting first row instruction directly.	
+  assign temp_inst_out[3*row-1:2] = temp_inst_q[3*row-1:2];	// Connecting all the outputs of temp_inst_q to wires. All except [1:0] as the first row gets direct instr.
+  
+  genvar j;
+  for (j=1; j < row ; j=j+1) begin
+	  assign temp_inst_in[3*(j+1)-1:3*j] = temp_inst_out[3*j-1:3*(j-1)];	//Connecting output wire of temp_inst_q to next pipe's input wire
   end
 
 

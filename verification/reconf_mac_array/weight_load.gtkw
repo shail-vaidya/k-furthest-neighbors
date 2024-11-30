@@ -1,0 +1,108 @@
+[*]
+[*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
+[*] Fri Nov 29 21:15:42 2024
+[*]
+[dumpfile] "E:\UCSD\Fall 2024\ECE 284\k-furthest-neighbors\verification\reconf_mac_array\reconf_mac_array_tb.vcd"
+[dumpfile_mtime] "Fri Nov 29 21:11:13 2024"
+[dumpfile_size] 176951
+[savefile] "E:\UCSD\Fall 2024\ECE 284\k-furthest-neighbors\verification\reconf_mac_array\weight_load.gtkw"
+[timestart] 13
+[size] 1440 829
+[pos] -1 -1
+*-5.546917 105 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] reconf_mac_array_tb.
+[treeopen] reconf_mac_array_tb.mac_array_inst.
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[1].mac_row_instance.
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[1].mac_row_instance.col_num[1].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[1].mac_row_instance.col_num[2].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[1].mac_row_instance.col_num[3].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[1].mac_row_instance.col_num[4].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[1].mac_row_instance.col_num[5].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[1].mac_row_instance.col_num[6].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[1].mac_row_instance.col_num[7].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[1].mac_row_instance.col_num[8].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[2].mac_row_instance.
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[2].mac_row_instance.col_num[1].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[2].mac_row_instance.col_num[2].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[2].mac_row_instance.col_num[3].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[2].mac_row_instance.col_num[4].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[2].mac_row_instance.col_num[5].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[2].mac_row_instance.col_num[6].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[2].mac_row_instance.col_num[7].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[2].mac_row_instance.col_num[8].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[3].mac_row_instance.
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[3].mac_row_instance.col_num[1].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[3].mac_row_instance.col_num[2].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[3].mac_row_instance.col_num[3].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[3].mac_row_instance.col_num[4].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[3].mac_row_instance.col_num[5].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[3].mac_row_instance.col_num[6].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[3].mac_row_instance.col_num[7].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[3].mac_row_instance.col_num[8].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[8].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[8].mac_row_instance.
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[8].mac_row_instance.col_num[1].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[8].mac_row_instance.col_num[2].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[8].mac_row_instance.col_num[3].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[8].mac_row_instance.col_num[4].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[8].mac_row_instance.col_num[5].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[8].mac_row_instance.col_num[6].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[8].mac_row_instance.col_num[7].
+[treeopen] reconf_mac_array_tb.mac_array_inst.row_num[8].mac_row_instance.col_num[8].
+[sst_width] 197
+[signals_width] 203
+[sst_expanded] 1
+[sst_vpaned_height] 234
+@28
+reconf_mac_array_tb.mac_array_inst.clk
+reconf_mac_array_tb.mac_array_inst.reset
+reconf_mac_array_tb.mac_array_inst.inst_w[2:0]
+@22
+reconf_mac_array_tb.mac_array_inst.in_w[31:0]
+@200
+-ROW1
+@22
+reconf_mac_array_tb.mac_array_inst.row_num[1].mac_row_instance.col_num[1].mac_tile_instance.b_q[3:0]
+reconf_mac_array_tb.mac_array_inst.row_num[1].mac_row_instance.col_num[2].mac_tile_instance.b_q[3:0]
+reconf_mac_array_tb.mac_array_inst.row_num[1].mac_row_instance.col_num[3].mac_tile_instance.b_q[3:0]
+reconf_mac_array_tb.mac_array_inst.row_num[1].mac_row_instance.col_num[4].mac_tile_instance.b_q[3:0]
+reconf_mac_array_tb.mac_array_inst.row_num[1].mac_row_instance.col_num[5].mac_tile_instance.b_q[3:0]
+reconf_mac_array_tb.mac_array_inst.row_num[1].mac_row_instance.col_num[6].mac_tile_instance.b_q[3:0]
+reconf_mac_array_tb.mac_array_inst.row_num[1].mac_row_instance.col_num[7].mac_tile_instance.b_q[3:0]
+reconf_mac_array_tb.mac_array_inst.row_num[1].mac_row_instance.col_num[8].mac_tile_instance.b_q[3:0]
+@200
+-ROW2
+@22
+reconf_mac_array_tb.mac_array_inst.row_num[2].mac_row_instance.col_num[1].mac_tile_instance.b_q[3:0]
+reconf_mac_array_tb.mac_array_inst.row_num[2].mac_row_instance.col_num[2].mac_tile_instance.b_q[3:0]
+reconf_mac_array_tb.mac_array_inst.row_num[2].mac_row_instance.col_num[3].mac_tile_instance.b_q[3:0]
+reconf_mac_array_tb.mac_array_inst.row_num[2].mac_row_instance.col_num[4].mac_tile_instance.b_q[3:0]
+reconf_mac_array_tb.mac_array_inst.row_num[2].mac_row_instance.col_num[5].mac_tile_instance.b_q[3:0]
+reconf_mac_array_tb.mac_array_inst.row_num[2].mac_row_instance.col_num[6].mac_tile_instance.b_q[3:0]
+reconf_mac_array_tb.mac_array_inst.row_num[2].mac_row_instance.col_num[7].mac_tile_instance.b_q[3:0]
+reconf_mac_array_tb.mac_array_inst.row_num[2].mac_row_instance.col_num[8].mac_tile_instance.b_q[3:0]
+@200
+-ROW3
+@22
+reconf_mac_array_tb.mac_array_inst.row_num[3].mac_row_instance.col_num[1].mac_tile_instance.b_q[3:0]
+reconf_mac_array_tb.mac_array_inst.row_num[3].mac_row_instance.col_num[2].mac_tile_instance.b_q[3:0]
+reconf_mac_array_tb.mac_array_inst.row_num[3].mac_row_instance.col_num[3].mac_tile_instance.b_q[3:0]
+reconf_mac_array_tb.mac_array_inst.row_num[3].mac_row_instance.col_num[4].mac_tile_instance.b_q[3:0]
+reconf_mac_array_tb.mac_array_inst.row_num[3].mac_row_instance.col_num[5].mac_tile_instance.b_q[3:0]
+reconf_mac_array_tb.mac_array_inst.row_num[3].mac_row_instance.col_num[6].mac_tile_instance.b_q[3:0]
+reconf_mac_array_tb.mac_array_inst.row_num[3].mac_row_instance.col_num[7].mac_tile_instance.b_q[3:0]
+reconf_mac_array_tb.mac_array_inst.row_num[3].mac_row_instance.col_num[8].mac_tile_instance.b_q[3:0]
+@200
+-ROW8
+@22
+reconf_mac_array_tb.mac_array_inst.row_num[8].mac_row_instance.col_num[1].mac_tile_instance.b_q[3:0]
+reconf_mac_array_tb.mac_array_inst.row_num[8].mac_row_instance.col_num[2].mac_tile_instance.b_q[3:0]
+reconf_mac_array_tb.mac_array_inst.row_num[8].mac_row_instance.col_num[3].mac_tile_instance.b_q[3:0]
+reconf_mac_array_tb.mac_array_inst.row_num[8].mac_row_instance.col_num[4].mac_tile_instance.b_q[3:0]
+reconf_mac_array_tb.mac_array_inst.row_num[8].mac_row_instance.col_num[5].mac_tile_instance.b_q[3:0]
+reconf_mac_array_tb.mac_array_inst.row_num[8].mac_row_instance.col_num[6].mac_tile_instance.b_q[3:0]
+reconf_mac_array_tb.mac_array_inst.row_num[8].mac_row_instance.col_num[7].mac_tile_instance.b_q[3:0]
+@23
+reconf_mac_array_tb.mac_array_inst.row_num[8].mac_row_instance.col_num[8].mac_tile_instance.b_q[3:0]
+[pattern_trace] 1
+[pattern_trace] 0
