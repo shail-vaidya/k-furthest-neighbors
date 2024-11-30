@@ -1,0 +1,94 @@
+[*]
+[*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
+[*] Sat Nov 30 00:46:25 2024
+[*]
+[dumpfile] "C:\Users\hari2\Desktop\ECE 284\Project\k-furthest-neighbors\verification\mac_tile\mac_tile_reconf_tb.vcd"
+[dumpfile_mtime] "Sat Nov 30 00:32:41 2024"
+[dumpfile_size] 3205
+[savefile] "C:\Users\hari2\Desktop\ECE 284\Project\k-furthest-neighbors\verification\mac_tile\mac_tile_output_stationary_wf.gtkw"
+[timestart] 0
+[size] 1280 729
+[pos] -1 -1
+*-5.048698 125 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] mac_tile_reconf_tb.
+[treeopen] mac_tile_reconf_tb.mac_tile_reconf_inst.
+[sst_width] 197
+[signals_width] 179
+[sst_expanded] 1
+[sst_vpaned_height] 199
+@22
+mac_tile_reconf_tb.a_in[3:0]
+@420
+mac_tile_reconf_tb.b_in[3:0]
+@22
+mac_tile_reconf_tb.a_out[3:0]
+@c00420
+mac_tile_reconf_tb.psum_out[15:0]
+@28
+(0)mac_tile_reconf_tb.psum_out[15:0]
+(1)mac_tile_reconf_tb.psum_out[15:0]
+(2)mac_tile_reconf_tb.psum_out[15:0]
+(3)mac_tile_reconf_tb.psum_out[15:0]
+(4)mac_tile_reconf_tb.psum_out[15:0]
+(5)mac_tile_reconf_tb.psum_out[15:0]
+(6)mac_tile_reconf_tb.psum_out[15:0]
+(7)mac_tile_reconf_tb.psum_out[15:0]
+(8)mac_tile_reconf_tb.psum_out[15:0]
+(9)mac_tile_reconf_tb.psum_out[15:0]
+(10)mac_tile_reconf_tb.psum_out[15:0]
+(11)mac_tile_reconf_tb.psum_out[15:0]
+(12)mac_tile_reconf_tb.psum_out[15:0]
+(13)mac_tile_reconf_tb.psum_out[15:0]
+(14)mac_tile_reconf_tb.psum_out[15:0]
+(15)mac_tile_reconf_tb.psum_out[15:0]
+@1401200
+-group_end
+@22
+mac_tile_reconf_tb.mac_tile_reconf_inst.a_q[3:0]
+mac_tile_reconf_tb.mac_tile_reconf_inst.b_q[3:0]
+mac_tile_reconf_tb.mac_tile_reconf_inst.c_q[15:0]
+mac_tile_reconf_tb.mac_tile_reconf_inst.c_pipe_q[15:0]
+mac_tile_reconf_tb.mac_tile_reconf_inst.out_s[15:0]
+@c00028
+mac_tile_reconf_tb.mac_tile_reconf_inst.inst_w[2:0]
+@28
+(0)mac_tile_reconf_tb.mac_tile_reconf_inst.inst_w[2:0]
+(1)mac_tile_reconf_tb.mac_tile_reconf_inst.inst_w[2:0]
+(2)mac_tile_reconf_tb.mac_tile_reconf_inst.inst_w[2:0]
+@1401200
+-group_end
+@28
+mac_tile_reconf_tb.mac_tile_reconf_inst.shift_ready_q
+@29
+mac_tile_reconf_tb.mac_tile_reconf_inst.load_ready_q
+@28
+mac_tile_reconf_tb.inst_out[2:0]
+@22
+mac_tile_reconf_tb.mac_tile_reconf_inst.in_w[3:0]
+@c00420
+mac_tile_reconf_tb.mac_tile_reconf_inst.in_n[15:0]
+@28
+(0)mac_tile_reconf_tb.mac_tile_reconf_inst.in_n[15:0]
+(1)mac_tile_reconf_tb.mac_tile_reconf_inst.in_n[15:0]
+(2)mac_tile_reconf_tb.mac_tile_reconf_inst.in_n[15:0]
+(3)mac_tile_reconf_tb.mac_tile_reconf_inst.in_n[15:0]
+(4)mac_tile_reconf_tb.mac_tile_reconf_inst.in_n[15:0]
+(5)mac_tile_reconf_tb.mac_tile_reconf_inst.in_n[15:0]
+(6)mac_tile_reconf_tb.mac_tile_reconf_inst.in_n[15:0]
+(7)mac_tile_reconf_tb.mac_tile_reconf_inst.in_n[15:0]
+(8)mac_tile_reconf_tb.mac_tile_reconf_inst.in_n[15:0]
+(9)mac_tile_reconf_tb.mac_tile_reconf_inst.in_n[15:0]
+(10)mac_tile_reconf_tb.mac_tile_reconf_inst.in_n[15:0]
+(11)mac_tile_reconf_tb.mac_tile_reconf_inst.in_n[15:0]
+(12)mac_tile_reconf_tb.mac_tile_reconf_inst.in_n[15:0]
+(13)mac_tile_reconf_tb.mac_tile_reconf_inst.in_n[15:0]
+(14)mac_tile_reconf_tb.mac_tile_reconf_inst.in_n[15:0]
+(15)mac_tile_reconf_tb.mac_tile_reconf_inst.in_n[15:0]
+@1401200
+-group_end
+@28
+mac_tile_reconf_tb.mac_tile_reconf_inst.clk
+mac_tile_reconf_tb.mac_tile_reconf_inst.reset
+mac_tile_reconf_tb.mac_tile_reconf_inst.inst_q[2:0]
+[pattern_trace] 1
+[pattern_trace] 0

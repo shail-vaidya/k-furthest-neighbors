@@ -1,0 +1,278 @@
+$date
+	Fri Nov 29 16:32:41 2024
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1s
+$end
+$scope module mac_tile_reconf_tb $end
+$var wire 16 ! psum_out [15:0] $end
+$var wire 3 " inst_out [2:0] $end
+$var wire 4 # a_out [3:0] $end
+$var parameter 32 $ bw $end
+$var parameter 32 % col $end
+$var parameter 32 & psum_bw $end
+$var parameter 32 ' row $end
+$var reg 4 ( a_data [3:0] $end
+$var reg 4 ) a_in [3:0] $end
+$var reg 4 * b_data [3:0] $end
+$var reg 4 + b_in [3:0] $end
+$var reg 1 , clk $end
+$var reg 3 - inst_i [2:0] $end
+$var reg 1 . reset $end
+$var integer 32 / a_file [31:0] $end
+$var integer 32 0 a_result [31:0] $end
+$var integer 32 1 b_file [31:0] $end
+$var integer 32 2 b_result [31:0] $end
+$scope module mac_tile_reconf_inst $end
+$var wire 1 , clk $end
+$var wire 16 3 in_n [15:0] $end
+$var wire 4 4 in_w [3:0] $end
+$var wire 3 5 inst_e [2:0] $end
+$var wire 3 6 inst_w [2:0] $end
+$var wire 4 7 out_e [3:0] $end
+$var wire 1 . reset $end
+$var wire 16 8 out_s [15:0] $end
+$var wire 16 9 mac_out [15:0] $end
+$var parameter 32 : bw $end
+$var parameter 32 ; psum_bw $end
+$var reg 4 < a_q [3:0] $end
+$var reg 4 = b_q [3:0] $end
+$var reg 16 > c_pipe_q [15:0] $end
+$var reg 16 ? c_q [15:0] $end
+$var reg 3 @ inst_q [2:0] $end
+$var reg 1 A load_ready_q $end
+$var reg 1 B shift_ready_q $end
+$scope module mac_instance $end
+$var wire 4 C a [3:0] $end
+$var wire 4 D b [3:0] $end
+$var wire 16 E c [15:0] $end
+$var wire 16 F out [15:0] $end
+$var wire 16 G psum [15:0] $end
+$var wire 9 H product [8:0] $end
+$var wire 5 I a_pad [4:0] $end
+$var parameter 32 J bw $end
+$var parameter 32 K psum_bw $end
+$upscope $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+b10000 K
+b100 J
+b10000 ;
+b100 :
+b1000 '
+b10000 &
+b1000 %
+b100 $
+$end
+#0
+$dumpvars
+b0 I
+b0 H
+b0 G
+b0 F
+b0 E
+b0 D
+b0 C
+1B
+1A
+b0 @
+b0 ?
+b0 >
+b0 =
+b0 <
+b0 9
+b0 8
+b0 7
+b100 6
+b0 5
+b0 4
+b0 3
+bx 2
+bx 1
+bx 0
+bx /
+0.
+b100 -
+0,
+b0 +
+bx *
+b0 )
+bx (
+b0 #
+b0 "
+b0 !
+$end
+#5
+1,
+#10
+0,
+1.
+#15
+b100 "
+b100 5
+b100 @
+1,
+#20
+0,
+b1 3
+b1 +
+b1 )
+b1 4
+b1 2
+b1 *
+b1 0
+b1 (
+b10000000000000000000000000000100 1
+b10000000000000000000000000000011 /
+b110 -
+b110 6
+#25
+b1 !
+b1 8
+b1 9
+b1 F
+b1 G
+b1 H
+b1 =
+b1 D
+b1 I
+b1 #
+b1 7
+b1 <
+b1 C
+b110 "
+b110 5
+b110 @
+1,
+#30
+0,
+#35
+b10 9
+b10 F
+b10 G
+b1 ?
+b1 E
+1,
+#40
+0,
+#45
+b11 9
+b11 F
+b11 G
+b10 ?
+b10 E
+1,
+#50
+0,
+#55
+b100 9
+b100 F
+b100 G
+b11 ?
+b11 E
+1,
+#60
+0,
+#65
+b101 9
+b101 F
+b101 G
+b100 ?
+b100 E
+1,
+#70
+0,
+#75
+b110 9
+b110 F
+b110 G
+b101 ?
+b101 E
+1,
+#80
+0,
+#85
+b111 9
+b111 F
+b111 G
+b110 ?
+b110 E
+1,
+#90
+0,
+#95
+b1000 9
+b1000 F
+b1000 G
+b111 ?
+b111 E
+1,
+#100
+0,
+b101 -
+b101 6
+b0 2
+b11111111111111111111111111111111 0
+#105
+b1000 !
+b1000 8
+b1001 9
+b1001 F
+b1001 G
+b1000 ?
+b1000 E
+0B
+b1 >
+b101 "
+b101 5
+b101 @
+1,
+#110
+0,
+#115
+b1 !
+b1 8
+b10 9
+b10 F
+b10 G
+b1 ?
+b1 E
+1,
+#120
+0,
+b111 -
+b111 6
+#125
+b0 !
+b0 8
+1B
+b0 >
+b0 ?
+b0 E
+b0 =
+b0 D
+b0 9
+b0 F
+b0 G
+b0 H
+b0 I
+b0 #
+b0 7
+b0 <
+b0 C
+b111 "
+b111 5
+b111 @
+1,
+#130
+0,
+#135
+1,
+#140
+0,
