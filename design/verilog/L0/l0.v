@@ -28,7 +28,7 @@ module l0 (clk, in, out, rd, wr, o_full, reset, o_ready);
   assign rd_en[0] = rd;
 
   for (i=0; i<row ; i=i+1) begin : row_num
-      fifo_depth64 #(.bw(bw)) fifo_instance (
+      fifo_depth16 #(.bw(bw)) fifo_instance (
 	      .rd_clk   (clk),
 	      .wr_clk   (clk),
 	      .rd       (rd_en[i]),

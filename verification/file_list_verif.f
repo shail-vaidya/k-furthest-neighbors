@@ -2,7 +2,7 @@
 ../design/verilog/common_ip/fifo_mux_8_1.v
 ../design/verilog/common_ip/fifo_mux_16_1.v
 ../design/verilog/common_ip/fifo_depth8.v
-../design/verilog/common_ip/fifo_depth64.v
+../design/verilog/common_ip/fifo_depth16.v
 ../design/verilog/L0/l0.v
 ../design/verilog/OFIFO/ofifo.v
 ../design/verilog/PE_array/mac.v
