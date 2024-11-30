@@ -36,8 +36,8 @@ wire [psum_bw-1:0] mac_out;
 // 3'b110	|	O_EXEC
 // 3'b111	|	RESET
 // ----------------------------------
-always @ (posedge clk or negedge reset) begin
-	if(!reset) begin
+always @ (posedge clk or posedge reset) begin
+	if(reset) begin
 		a_q 			<= {bw{1'b0}};
 		b_q 			<= {bw{1'b0}};
 		inst_q 			<= 3'b000;

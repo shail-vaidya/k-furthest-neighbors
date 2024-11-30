@@ -21,8 +21,8 @@ reg [psum_bw-1:0] c_q;
 reg load_ready_q;
 wire [psum_bw-1:0] mac_out;
 
-always @ (posedge clk  or negedge reset) begin
-	if(!reset) begin
+always @ (posedge clk  or posedge reset) begin
+	if(reset) begin
 		a_q <= {bw{1'b0}};
 		b_q <= {bw{1'b0}};
 		inst_q <= 3'b000;

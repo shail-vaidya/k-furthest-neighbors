@@ -47,9 +47,9 @@ module mac_array (clk, reset, out_s, in_w, in_n, inst_w, valid);
   reg  [3*row-1:0] temp_inst_q;		// Registers to pipe intructions from north to south for rows 	
   					// Note: temp_inst_q[1:0] not used as first row gets direct instruction
 
-  always @ (posedge clk or negedge reset) begin
+  always @ (posedge clk or posedge reset) begin
    // inst_w flows to row0 to row7
-  	if(!reset) begin
+  	if(reset) begin
 		temp_inst_q <= {3*(row-1){1'b0}};		// Initialing all the instruction pipe registers to 0.
 	end
 	else begin

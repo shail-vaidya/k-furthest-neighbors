@@ -39,8 +39,8 @@ module ofifo (clk, in, out, rd, wr, o_full, reset, o_ready, o_valid);
   end
 
 
-  always @ (posedge clk or negedge reset) begin
-   if (!reset) begin
+  always @ (posedge clk or posedge reset) begin
+   if (reset) begin
       rd_en <= 0;
    end
    else

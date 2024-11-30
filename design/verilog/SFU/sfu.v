@@ -32,8 +32,8 @@ module sfu #(
     end
 
     integer j;
-    always @(posedge clk, negedge reset) begin
-        if(!reset) begin
+    always @(posedge clk, posedge reset) begin
+        if(reset) begin
             acc_q <= 0;
             psum_q <= 0;
             valid_q <= 0;
