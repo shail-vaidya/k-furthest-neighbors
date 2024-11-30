@@ -27,7 +27,7 @@ wire [psum_bw-1:0] mac_out;
 //       Instruction Mapping
 // ---------------------------------
 // Value	|	Description
-// 3'b000	|	W_IDLE
+// 3'b000	|	IDLE
 // 3'b001	|	W_LOAD
 // 3'b010	|	W_EXEC
 // 3'b011	|	NOT_USED
