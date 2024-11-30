@@ -17,7 +17,6 @@ reg clk = 1;
 reg reset = 1;
 //FIXME: Why was this updated to 50?
 wire [49:0] inst_q; 
-
 reg [1:0]  inst_w_q = 0; 
 reg [bw*row-1:0] D_xmem_q = 0;
 reg CEN0_xmem = 1;
@@ -99,40 +98,23 @@ integer error;
 //  inst[1]       = execute_q; 
 //  inst[0]       = load_q;
 
-
-//assign inst_q[34] = acc_q;
-//assign inst_q[33] = CEN_pmem_q;
-//assign inst_q[32] = WEN_pmem_q;
-//assign inst_q[31:21] = A_pmem_q;
-//assign inst_q[20]   = CEN_xmem_q;
-//assign inst_q[19]   = WEN_xmem_q;
-//assign inst_q[18:8] = A_xmem_q;
-//assign inst_q[7]   = ofifo_rd_q;
-//assign inst_q[6]   = ififo_wr_q;
-//assign inst_q[5]   = ififo_rd_q;
-//assign inst_q[4]   = l0_rd_q;
-//assign inst_q[3]   = l0_wr_q;
-//assign inst_q[2]   = mode_q; 
-//assign inst_q[1]   = execute_q; 
-//assign inst_q[0]   = load_q;
- 
-assign inst_q[49] 	= acc_q;
-assign inst_q[48] 	= CEN_pmem_q;
-assign inst_q[47] 	= WEN_pmem_q;
+assign inst_q[49] 	  = acc_q;
+assign inst_q[48] 	  = CEN_pmem_q;
+assign inst_q[47] 	  = WEN_pmem_q;
 assign inst_q[46:33] 	= A_pmem_q;
-assign inst_q[32] 	= CEN1_xmem_q;
+assign inst_q[32] 	  = CEN1_xmem_q;
 assign inst_q[31:21] 	= A1_xmem_q;
 assign inst_q[20]   	= CEN0_xmem_q;
 assign inst_q[19]   	= WEN0_xmem_q;
 assign inst_q[18:8] 	= A0_xmem_q;
-assign inst_q[7]  	= ofifo_rd_q;
-assign inst_q[6]  	= ififo_wr_q;
-assign inst_q[5]  	= ififo_rd_q;
-assign inst_q[4]  	= l0_rd_q;
-assign inst_q[3]  	= l0_wr_q;
-assign inst_q[2]  	= mode_q; 
-assign inst_q[1]  	= execute_q; 
-assign inst_q[0]  	= load_q; 
+assign inst_q[7]  	  = ofifo_rd_q;
+assign inst_q[6]  	  = ififo_wr_q;
+assign inst_q[5]  	  = ififo_rd_q;
+assign inst_q[4]  	  = l0_rd_q;
+assign inst_q[3]  	  = l0_wr_q;
+assign inst_q[2]  	  = mode_q; 
+assign inst_q[1]  	  = execute_q; 
+assign inst_q[0]  	  = load_q; 
 
 
 core  #(.bw(bw), .col(col), .row(row)) core_instance (
@@ -175,15 +157,15 @@ initial begin
   x_scan_file = $fscanf(x_file,"%s", captured_data);
   x_scan_file = $fscanf(x_file,"%s", captured_data);
 
-  //////// Reset /////////
+  //-------------- Reset --------------
   #0.5 
   reset = 1;
   #10
   reset = 0;
   #2 
-  /////////////////////////
+  //-----------------------------------
 
-  /////// Activation data writing to memory ///////
+  //----------------------------------- Activation data writing to memory ------------------------------------------
   for (t=0; t<len_nij; t=t+1) begin  
     #1 x_scan_file = $fscanf(x_file,"%32b", D_xmem); WEN0_xmem = 0; CEN0_xmem = 0; if (t>0) A0_xmem = A0_xmem + 1;   
   end
@@ -192,22 +174,23 @@ initial begin
   #5 
 
   $fclose(x_file);
-  /////////////////////////////////////////////////
+  //-----------------------------------------------------------------------------------------------------------------
 
 
-  for (kij=0; kij<1; kij=kij+1) begin  // kij loop
+  for (kij=0; kij<2; kij=kij+1) begin  // Weight loading to SRAM loop
 
     case(kij)
      0: w_file_name = "weight.txt"; //all ic and oc; 32 bits = 4*(rows)
-//     0: w_file_name = "weight_itile0_otile0_kij0.txt"; //all ic and oc; 32 bits = 4*(rows)
-//     1: w_file_name = "weight_itile0_otile0_kij1.txt";
-//     2: w_file_name = "weight_itile0_otile0_kij2.txt";
-//     3: w_file_name = "weight_itile0_otile0_kij3.txt";
-//     4: w_file_name = "weight_itile0_otile0_kij4.txt";
-//     5: w_file_name = "weight_itile0_otile0_kij5.txt";
-//     6: w_file_name = "weight_itile0_otile0_kij6.txt";
-//     7: w_file_name = "weight_itile0_otile0_kij7.txt";
-//     8: w_file_name = "weight_itile0_otile0_kij8.txt";
+     1: w_file_name = "weight.txt"; //all ic and oc; 32 bits = 4*(rows)
+  //   0: w_file_name = "weight_itile0_otile0_kij0.txt"; //all ic and oc; 32 bits = 4*(rows)
+  //   1: w_file_name = "weight_itile0_otile0_kij1.txt";
+  //   2: w_file_name = "weight_itile0_otile0_kij2.txt";
+  //   3: w_file_name = "weight_itile0_otile0_kij3.txt";
+  //   4: w_file_name = "weight_itile0_otile0_kij4.txt";
+  //   5: w_file_name = "weight_itile0_otile0_kij5.txt";
+  //   6: w_file_name = "weight_itile0_otile0_kij6.txt";
+  //   7: w_file_name = "weight_itile0_otile0_kij7.txt";
+  //   8: w_file_name = "weight_itile0_otile0_kij8.txt";
     endcase
     
 
@@ -217,59 +200,60 @@ initial begin
     w_scan_file = $fscanf(w_file,"%s", captured_data);
     w_scan_file = $fscanf(w_file,"%s", captured_data);
 
-    /////// Kernel data writing to memory ///////
+    //---------------------------------- Kernel data writing to memory --------------------------------------------------
 
-    A0_xmem = 11'b10000000000;
+    A0_xmem = 11'b10000000000 + kij*11'h8;
     for (t=0; t<col; t=t+1) begin  //iterating over all cols (oc)
       #1 w_scan_file = $fscanf(w_file,"%32b", D_xmem); WEN0_xmem = 0; CEN0_xmem = 0; if (t>0) A0_xmem = A0_xmem + 1;  
     end
+    //------------------------------------------------------------------------------------------------------------------
 
-    #1 WEN0_xmem = 1;  CEN0_xmem = 1; A0_xmem = 0;
-    /////////////////////////////////////
+  end // end of Weight loading to SRAM loop
 
+  #1 WEN0_xmem = 1;  CEN0_xmem = 1;
+  #1
 
-    /////// Kernel data writing to L0 ///////
-    // SHAIL
-    t = col + len_nij;
-    A0_xmem = 11'h400;
-    while (t > 0) begin
-      if(l0_ready) begin
-        #1;
-        CEN0_xmem = 0;
-        WEN0_xmem = 1;
-        if (t == len_nij) begin
-          A0_xmem = 11'h0;
-        end
-        else if (t < (col+len_nij)) begin
-          A0_xmem = A0_xmem + 1;
-        end
-        if (t > len_nij) begin
-          mode = 0;
-          execute = 0;
-          load = 1;
+  for (kij=0; kij<2; kij=kij+1) begin
+
+    // -------------------------- Load and Execute ---------------------------------------------------
+      t = col + len_nij;
+      A0_xmem = 11'h400 + kij*11'h8;;
+      while (t > 0) begin
+        if(l0_ready) begin
+          #1;
+          CEN0_xmem = 0;
+          WEN0_xmem = 1;
+          if (t == len_nij) begin
+            A0_xmem = 11'h0;
+          end
+          else if (t < (col+len_nij)) begin
+            A0_xmem = A0_xmem + 1;
+          end
+          if (t > len_nij) begin
+            mode = 0;
+            execute = 0;
+            load = 1;
+          end
+          else begin
+            load = 0;
+            execute = 1;
+          end
         end
         else begin
-          load = 0;
-          execute = 1;
+          #1
+          CEN0_xmem = 1;
+          WEN0_xmem = 1;
         end
+        t = t - 1;
       end
-      else begin
-        #1
-        CEN0_xmem = 1;
-        WEN0_xmem = 1;
-      end
-      t = t - 1;
-    end
 
-    #1
-    load = 1;
-    execute = 1;
-    mode = 1;
-    #1
-    load = 0;
-    execute = 0;
-    mode = 0;
-
+      #1
+      load = 1;
+      execute = 1;
+      mode = 1;
+      CEN0_xmem = 1;
+      WEN0_xmem = 1;
+  end
 
     //////// OFIFO READ ////////
     // Ideally, OFIFO should be read while execution, but we have enough ofifo
@@ -278,7 +262,7 @@ initial begin
     /////////////////////////////////////
 
 
-  end  // end of kij loop
+
 
 //COMMENTING OUT BELOW TB FOR NOW//
 
