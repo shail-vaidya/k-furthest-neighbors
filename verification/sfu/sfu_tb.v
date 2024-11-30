@@ -6,7 +6,7 @@ parameter row = 8;
 parameter psum_bw = 16;
 
 reg clk = 0;
-reg reset = 0;
+reg reset = 1;
 reg  [psum_bw*col-1:0] psum;
 reg  [psum_bw*col-1:0] psum_in;
 reg acc;
@@ -24,8 +24,8 @@ sfu #(
     .clk        (clk),
     .reset      (reset),
     .acc_i      (acc_i),
+    .mode_i     (1'b1),
     .psum_in    (psum_in),
-    .valid_o    (valid_o),
     .psum_out   (sfu_out)
 );
 
@@ -39,7 +39,7 @@ initial begin
     psum_in = {psum_bw*col{1'b0}};
     acc_i = 0;
     #20
-    reset = 1'b1;
+    reset = 1'b0;
 
 
     psum_file = $fopen("psum.txt", "r");
@@ -67,6 +67,7 @@ initial begin
         end
     $fclose(psum_file);
     $fclose(acc_file);
+    #20
     $finish;
 end
 

@@ -48,6 +48,8 @@ wire [psum_bw*col-1:0] ofifo_rdata;
 wire [bw*row-1:0] Q0_xmem;
 wire [bw*row-1:0] Q1_xmem;
 
+wire [psum_bw*col-1:0] sfu_i_data;
+
 //*************************************************************
 //                          Misc Logic
 //*************************************************************
@@ -79,6 +81,8 @@ corelet #(
     .ififo_wr           (inst[6]),
     .ififo_wdata        (Q1_xmem),
     // SFP Ports
+    .sfp_acc_i          (inst[49]),
+    .sfp_psum_i         (sfu_i_data),
     .sfp_out            (sfp_out)
 );
 
@@ -94,7 +98,7 @@ xmem_2048x32 xmem_inst (
     .Q0      (Q0_xmem),
     .WEN1    (1'b1),    // Tied high so that Port1 can be used only for reading
     .CEN1    (inst[32]),
-    .D1      (),  
+    .D1      (32'b0),  
     .A1      (inst[31:21]),  
     .Q1      (Q1_xmem)
 );
@@ -107,7 +111,7 @@ pmem_16384x128 pmem_inst (
     .CEN    (inst[48]),
     .D      (ofifo_rdata),  
     .A      (inst[46:33]),  
-    .Q      ()     //TODO connecting pmem to SFP
+    .Q      (sfu_i_data)     
 );
 
 endmodule
