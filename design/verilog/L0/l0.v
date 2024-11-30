@@ -39,8 +39,8 @@ module l0 (clk, in, out, rd, wr, o_full, reset, o_ready);
   end
 
 
-  always @ (posedge clk) begin
-   if (reset) begin
+  always @ (posedge clk or negedge reset) begin
+   if (!reset) begin
       rd_en <= 8'b00000000;
    end
    else
