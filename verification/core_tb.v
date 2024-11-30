@@ -242,15 +242,14 @@ initial begin
 
 
     /////// Kernel data writing to L0 ///////
-    A0_xmem = 11'b10000000000;
-
-    //SRAM read begins;
-    #0.5 clk = 1'b0; WEN0_xmem = 1; CEN0_xmem = 0; if (t>0) A0_xmem = A0_xmem; 
+    
+    //SRAM read begins for wgtmem;
+    #0.5 clk = 1'b0; WEN0_xmem = 1; CEN0_xmem = 0; A0_xmem = 11'b10000000000;
     #0.5 clk = 1'b1; 
 
     //SRAM read continues; L0 wgt write begins;
-    for (t=0; t<col - 1; t=t+1) begin  //o_full needs to be added ; 7th row is getting populated first. should we reverse it?
-      #0.5 clk = 1'b0; WEN0_xmem = 1; CEN0_xmem = 0; if (t>0) A0_xmem = A0_xmem + 1; l0_wr=1; 
+    for (t=0; t<col - 1; t=t+1) begin  		//FIXME:o_full needs to be added ; 7th row is getting populated first. should we reverse it?
+      #0.5 clk = 1'b0; WEN0_xmem = 1; CEN0_xmem = 0; A0_xmem = A0_xmem + 1; l0_wr=1; 
       #0.5 clk = 1'b1; 
     end
 
@@ -262,23 +261,20 @@ initial begin
 
 
     /////// Kernel/Act loading to PEs and act writing to L0///////
-
-    //reading actmem from SRAM0 
-    A0_xmem   = 0;
-
-    //SRAM read begins;
-    #0.5 clk = 1'b0; WEN0_xmem = 1; CEN0_xmem = 0; if (t>0) A0_xmem = A0_xmem + 1; 
+    
+    //SRAM read begins for actmem;
+    #0.5 clk = 1'b0; WEN0_xmem = 1; CEN0_xmem = 0; A0_xmem  = 0;
     #0.5 clk = 1'b1;    
  
     //SRAM read continues; L0 act write begins; L0 wgt read begins; Load instruction begins
     for (t=0; t<col; t=t+1) begin		//FIXME:o_full needs to be added ; 7th row is getting populated first. should we reverse it?
-      #0.5 clk = 1'b0; WEN0_xmem = 1; CEN0_xmem = 0; if (t>0) A0_xmem = A0_xmem + 1; l0_wr=1; l0_rd = 1; load = 1; execute = 0;	//set l0_rd, l0_wr and load PE
+      #0.5 clk = 1'b0; WEN0_xmem = 1; CEN0_xmem = 0; A0_xmem = A0_xmem + 1; l0_wr=1; l0_rd = 1; load = 1; execute = 0;	//set l0_rd, l0_wr and load PE
       #0.5 clk = 1'b1;
     end
 
     //SRAM read continues; L0 act write continues; L0 act read begins; Execute instruction begins
     for (t=0; t<len_nij - col - 1; t=t+1) begin	//FIXME:o_full needs to be added ; 7th row is getting populated first. should we reverse it?
-      #0.5 clk = 1'b0; WEN0_xmem = 1; CEN0_xmem = 0; if (t>0) A0_xmem = A0_xmem + 1; l0_wr=1; l0_rd = 1; load = 0; execute = 1;	//set l0_rd, l0_wr and execute PE
+      #0.5 clk = 1'b0; WEN0_xmem = 1; CEN0_xmem = 0; A0_xmem = A0_xmem + 1; l0_wr=1; l0_rd = 1; load = 0; execute = 1;	//set l0_rd, l0_wr and execute PE
       #0.5 clk = 1'b1;
     end
 
