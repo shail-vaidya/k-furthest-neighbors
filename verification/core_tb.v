@@ -227,6 +227,7 @@ initial begin
     #0.5 clk = 1'b0;   
     #0.5 clk = 1'b1;   
 
+
     /////// Kernel data writing to memory ///////
 
     A0_xmem = 11'b10000000000;
@@ -239,11 +240,12 @@ initial begin
     #0.5 clk = 1'b1; 
     /////////////////////////////////////
 
+
     /////// Kernel data writing to L0 ///////
     A0_xmem = 11'b10000000000;
 
     //SRAM read begins;
-    #0.5 clk = 1'b0; WEN0_xmem = 1; CEN0_xmem = 0; if (t>0) A0_xmem = A0_xmem + 1; 
+    #0.5 clk = 1'b0; WEN0_xmem = 1; CEN0_xmem = 0; if (t>0) A0_xmem = A0_xmem; 
     #0.5 clk = 1'b1; 
 
     //SRAM read continues; L0 wgt write begins;
@@ -258,6 +260,7 @@ initial begin
 
     /////////////////////////////////////
 
+
     /////// Kernel/Act loading to PEs and act writing to L0///////
 
     //reading actmem from SRAM0 
@@ -268,31 +271,32 @@ initial begin
     #0.5 clk = 1'b1;    
  
     //SRAM read continues; L0 act write begins; L0 wgt read begins; Load instruction begins
-    for (t=0; t<col; t=t+1) begin		//o_full needs to be added ; 7th row is getting populated first. should we reverse it?
-      #0.5 clk = 1'b0; WEN0_xmem = 1; CEN0_xmem = 0; if (t>0) A0_xmem = A0_xmem + 1; l0_wr=1; l0_rd = 1; load = 1;	//set l0_rd, l0_wr and load PE
+    for (t=0; t<col; t=t+1) begin		//FIXME:o_full needs to be added ; 7th row is getting populated first. should we reverse it?
+      #0.5 clk = 1'b0; WEN0_xmem = 1; CEN0_xmem = 0; if (t>0) A0_xmem = A0_xmem + 1; l0_wr=1; l0_rd = 1; load = 1; execute = 0;	//set l0_rd, l0_wr and load PE
       #0.5 clk = 1'b1;
     end
 
     //SRAM read continues; L0 act write continues; L0 act read begins; Execute instruction begins
-    for (t=0; t<len_nij - col - 1; t=t+1) begin	//o_full needs to be added ; 7th row is getting populated first. should we reverse it?
-      #0.5 clk = 1'b0; WEN0_xmem = 1; CEN0_xmem = 0; if (t>0) A0_xmem = A0_xmem + 1; l0_wr=1; l0_rd = 1; execute = 1;	//set l0_rd, lo_wr and execute PE
+    for (t=0; t<len_nij - col - 1; t=t+1) begin	//FIXME:o_full needs to be added ; 7th row is getting populated first. should we reverse it?
+      #0.5 clk = 1'b0; WEN0_xmem = 1; CEN0_xmem = 0; if (t>0) A0_xmem = A0_xmem + 1; l0_wr=1; l0_rd = 1; load = 0; execute = 1;	//set l0_rd, l0_wr and execute PE
       #0.5 clk = 1'b1;
     end
 
-    //SRAM read ends; last L0 act write issues;
-      #0.5 clk = 1'b0; WEN0_xmem = 1;  CEN0_xmem = 1; A0_xmem = 0; l0_wr=1; l0_rd = 1; execute = 1;
-      #0.5 clk = 1'b1; 
+    //SRAM read ends; last L0 act write issues; L0 act read continues; Excute instruction continues; SRAM turns off
+      #0.5 clk = 1'b0; WEN0_xmem = 1;  CEN0_xmem = 1; A0_xmem = 0; l0_wr=1; l0_rd = 1; load = 0; execute = 1;
+      #0.5 clk = 1'b1;
+ 
     /////////////////////////////////////
   
 
-///STIM should be okay above this
-
     /////// Last 8 act loading to PE ///////
-    for (t=0; t<col; t=t+1) begin		//o_full needs to be added ; 7th row is getting populated first. should we reverse it?
-      #0.5 clk = 1'b0; WEN0_xmem = 1; l0_wr=0; CEN0_xmem = 1; if (t>0) A0_xmem = A0_xmem + 1; l0_rd = 1; execute = 1;	//SRAM can be off, set l0_rd and execute PE
+
+    //L0 act read continues; Execute instruction continues;
+    for (t=0; t<col; t=t+1) begin		//FIXME:o_full needs to be added ; 7th row is getting populated first. should we reverse it?
+      #0.5 clk = 1'b0; l0_wr=0; l0_rd = 1; load = 0; execute = 1;	//set l0_rd and execute PE
       #0.5 clk = 1'b1; 
     end
-      #0.5 clk = 1'b0; WEN0_xmem = 1; CEN0_xmem = 1; A0_xmem = 0; l0_wr = 0; l0_rd = 0;
+      #0.5 clk = 1'b0; l0_wr = 0; l0_rd = 0; load = 0; execute = 0;	//clear inst_w and in_w
       #0.5 clk = 1'b1; 
     /////////////////////////////////////
 
