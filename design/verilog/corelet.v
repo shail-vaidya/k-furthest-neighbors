@@ -145,7 +145,6 @@ sfu #(
     .clk        (clk),
     .reset      (reset),
     .acc_i      (sfp_acc_i),
-    .mode_i     (1'b0), // TODO Connect mode logic
     .psum_in    (sfp_psum_i),
     .psum_out   (sfp_out)
 );

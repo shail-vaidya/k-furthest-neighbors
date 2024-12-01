@@ -6,7 +6,7 @@ parameter row = 8;
 parameter psum_bw = 16;
 
 reg clk = 0;
-reg reset = 1;
+reg reset = 1;  
 reg  [psum_bw*col-1:0] psum;
 reg  [psum_bw*col-1:0] psum_in;
 reg acc;
@@ -24,7 +24,6 @@ sfu #(
     .clk        (clk),
     .reset      (reset),
     .acc_i      (acc_i),
-    .mode_i     (1'b1),
     .psum_in    (psum_in),
     .psum_out   (sfu_out)
 );
@@ -35,7 +34,7 @@ initial begin
     $dumpfile("sfu_tb.vcd");
     $dumpvars(0,sfu_tb);
 
-    clk = 0;
+    clk = 1;
     psum_in = {psum_bw*col{1'b0}};
     acc_i = 0;
     #20
