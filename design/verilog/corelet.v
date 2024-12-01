@@ -57,9 +57,11 @@ wire [bw*row-1:0]       l0_rdata;
 //                      Misc  Logic
 //*************************************************************
 genvar i;
-    for (i=0; i < col ; i=i+1) begin
+    generate
+    for (i=0; i < col ; i=i+1) begin : corelet_in_n_connection
         assign in_n[psum_bw*(i+1)-1:psum_bw*i] = {{(psum_bw-bw){1'b0}},ififo_rdata[bw*(i+1)-1:bw*i]};
     end
+    endgenerate
 
 //*************************************************************
 //                      PE Array Instance

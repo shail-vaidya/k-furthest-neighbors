@@ -20,7 +20,8 @@ module mac_array (clk, reset, out_s, in_w, in_n, inst_w, valid);
   wire [3*row-1:0] temp_inst_out;
 
   genvar i;
-  for (i=1; i < row+1 ; i=i+1) begin : row_num
+  generate
+    for (i=1; i < row+1 ; i=i+1) begin : mac_array_row_num
       mac_row #(.bw(bw), .psum_bw(psum_bw)) mac_row_instance (
       	.clk (clk),
       	.reset (reset),
@@ -30,8 +31,8 @@ module mac_array (clk, reset, out_s, in_w, in_n, inst_w, valid);
 	      .out_s(temp[psum_bw*col*(i+1)-1:psum_bw*col*i]),
 	      .valid(temp_valid[col*i-1:col*(i-1)])
       );
-  end
-
+    end
+  endgenerate
 
   assign out_s = temp[psum_bw*col*(row+1)-1:psum_bw*col*row];	// Taking out_s of the last row as the final outputs of the mac_array 
   assign temp[psum_bw*col-1:0] = in_n[psum_bw*col-1:0];
@@ -58,12 +59,13 @@ module mac_array (clk, reset, out_s, in_w, in_n, inst_w, valid);
   end
 
   assign temp_inst_out[2:0] = inst_w[2:0];		// Connecting first row instruction directly.	
-  assign temp_inst_out[3*row-1:2] = temp_inst_q[3*row-1:2];	// Connecting all the outputs of temp_inst_q to wires. All except [1:0] as the first row gets direct instr.
+  assign temp_inst_out[3*row-1:3] = temp_inst_q[3*row-1:3];	// Connecting all the outputs of temp_inst_q to wires. All except [1:0] as the first row gets direct instr.
   
   genvar j;
-  for (j=1; j < row ; j=j+1) begin
-	  assign temp_inst_in[3*(j+1)-1:3*j] = temp_inst_out[3*j-1:3*(j-1)];	//Connecting output wire of temp_inst_q to next pipe's input wire
-  end
-
+  generate
+    for (j=1; j < row ; j=j+1) begin : mac_array_inst_trickle
+	    assign temp_inst_in[3*(j+1)-1:3*j] = temp_inst_out[3*j-1:3*(j-1)];	//Connecting output wire of temp_inst_q to next pipe's input wire
+    end
+  endgenerate
 
 endmodule
