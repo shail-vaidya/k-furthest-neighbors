@@ -10,7 +10,6 @@ parameter len_kij = 9;
 parameter len_onij = 16;
 parameter col = 8;
 parameter row = 8;
-//FIXME: Reducing len nij to take only 16 inputs first
 parameter len_nij = 1024;
 
 reg clk = 1;
@@ -57,7 +56,7 @@ reg [bw*row-1:0] D_xmem;
 reg [psum_bw*col-1:0] answer;
 
 
-reg ofifo_rd;
+
 reg ififo_wr;
 reg ififo_rd;
 reg l0_rd;
@@ -71,13 +70,14 @@ wire ofifo_valid;
 wire [col*psum_bw-1:0] sfp_out;
 wire l0_ready;
 wire ififo_ready;
+wire ofifo_rd;
 
 integer x_file, x_scan_file ; // file_handler
 integer w_file, w_scan_file ; // file_handler
 integer acc_file, acc_scan_file ; // file_handler
 integer out_file, out_scan_file ; // file_handler
 integer captured_data; 
-integer t, i, j, k, kij;
+integer t, i, j, k, kij, m;
 integer error;
 
 //  inst[49]      = acc_q;
@@ -114,7 +114,8 @@ assign inst_q[4]  	  = l0_rd_q;
 assign inst_q[3]  	  = l0_wr_q;
 assign inst_q[2]  	  = mode_q; 
 assign inst_q[1]  	  = execute_q; 
-assign inst_q[0]  	  = load_q; 
+assign inst_q[0]  	  = load_q;
+assign ofifo_rd       = !CEN_pmem && !WEN_pmem;
 
 
 core  #(.bw(bw), .col(col), .row(row)) core_instance (
@@ -138,7 +139,7 @@ initial begin
   A0_xmem   = 0;
   CEN1_xmem = 1;
   A1_xmem   = 0;
-  ofifo_rd = 0;
+  //ofifo_rd = 0;
   ififo_wr = 0;
   ififo_rd = 0;
   l0_rd    = 0;
@@ -216,49 +217,88 @@ initial begin
   #1 WEN0_xmem = 1;  CEN0_xmem = 1;
   #1
 
-  for (kij=0; kij<2; kij=kij+1) begin
 
-    // -------------------------- Load and Execute ---------------------------------------------------
-      t = col + len_nij;
-      while (t > 0) begin
-        if(l0_ready) begin
-          #1;
-          CEN0_xmem = 0;
-          WEN0_xmem = 1;
-          if (t == (col+len_nij))
-            A0_xmem = 11'h400 + kij*11'h8;
-          if (t == len_nij) begin
-            A0_xmem = 11'h0;
-          end
-          else if (t < (col+len_nij)) begin
-            A0_xmem = A0_xmem + 1;
-          end
-          if (t > len_nij) begin
+  fork
+    begin
+      for (kij=0; kij<2; kij=kij+1) begin 
+        t = col;
+        while (t > 0) begin
+          if(l0_ready) begin
+            #1;
+            CEN0_xmem = 0;
+            WEN0_xmem = 1;
+            if (t == col)
+              A0_xmem = 11'h400 + kij*11'h8;
+            else if (t < col) begin
+              A0_xmem = A0_xmem + 1;
+            end
             mode = 0;
             execute = 0;
             load = 1;
+            t = t - 1;
           end
           else begin
+            #1;
+            CEN0_xmem = 1;
+            WEN0_xmem = 1;
+          end
+        end
+        t=len_nij;
+        while (t > 0) begin
+          if(l0_ready) begin
+            #1;
+            CEN0_xmem = 0;
+            WEN0_xmem = 1;
+            if (t == len_nij)
+              A0_xmem = 11'h0;
+            else if (t < len_nij) begin
+              A0_xmem = A0_xmem + 1;
+            end
             load = 0;
             execute = 1;
+            t = t - 1;
           end
-          t = t - 1;
+          else begin
+            #1;
+            CEN0_xmem = 1;
+            WEN0_xmem = 1;
+          end
         end
-        else begin
-          #1
-          CEN0_xmem = 1;
-          WEN0_xmem = 1;
-        end
+        #1;
+        load = 1;
+        execute = 1;
+        mode = 1;
+        CEN0_xmem = 1;
+        WEN0_xmem = 1;
       end
-
-      #1
-      load = 1;
-      execute = 1;
-      mode = 1;
-      CEN0_xmem = 1;
-      WEN0_xmem = 1;
-  end
-
+      #1;
+      load = 0;
+      execute = 0;
+      mode = 0; 
+      end
+    begin
+        m=len_nij*2;
+        //m=len_nij*len_kij; //1024*9
+        while (m > 0) begin
+          if(ofifo_valid) begin
+            #1;
+            CEN_pmem = 0;
+            WEN_pmem = 0;
+            if (m < len_nij * len_kij) begin
+              A_pmem = A_pmem + 1;
+            end
+            m=m-1;
+          end
+          else begin
+            #1;
+            CEN_pmem = 1;
+            WEN_pmem = 1; 
+          end
+        end 
+    end
+  join
+  
+        
     //////// OFIFO READ ////////
     // Ideally, OFIFO should be read while execution, but we have enough ofifo
     // depth so we can fetch out after execution.
@@ -375,6 +415,7 @@ always @(negedge clk ) begin
   l0_wr <= ~CEN0_xmem_q && WEN0_xmem_q;
   ififo_wr <= ~CEN1_xmem_q;
   l0_rd <= l0_wr; 
+  ififo_rd <= ififo_wr;
 end
 
 
