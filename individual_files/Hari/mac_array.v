@@ -25,17 +25,21 @@ module mac_array (clk, reset, out_s, in_w, in_n, inst_w, valid);
   assign temp_out_s[(col*psum_bw)-1:0]   = in_n;
 
   genvar i;
-  for (i=1; i < row+1 ; i=i+1) begin : row_num
+  generate
+  
+  for (i=1; i < row+1 ; i=i+1) begin : array_row_num
       mac_row #(.bw(bw), .psum_bw(psum_bw), .col(col)) mac_row_instance (
-	.clk(clk), 
-	.reset(reset),
-	.out_s(temp_out_s[(i+1)*psum_bw*col-1:(i)*psum_bw*col]),
-	.in_w(in_w[(i*bw)-1:(i-1)*bw]), 
-	.inst_w(ins_w_temp[(2*i)-1:2*(i-1)]), 
-	.valid(temp_valid[row*i-1:row*(i-1)]),  
-	.in_n(temp_out_s[i*psum_bw*col-1:(i-1)*psum_bw*col])
+	    .clk(clk), 
+	    .reset(reset),
+	    .out_s(temp_out_s[(i+1)*psum_bw*col-1:(i)*psum_bw*col]),
+	    .in_w(in_w[(i*bw)-1:(i-1)*bw]), 
+    	.inst_w(ins_w_temp[(2*i)-1:2*(i-1)]), 
+	    .valid(temp_valid[row*i-1:row*(i-1)]),  
+    	.in_n(temp_out_s[i*psum_bw*col-1:(i-1)*psum_bw*col])
       );
   end
+
+  endgenerate
 
   assign out_s = temp_out_s[(row)*psum_bw*col-1:(row-1)*psum_bw*col];
   assign valid = temp_valid[row*col-1:row*(col-1)];

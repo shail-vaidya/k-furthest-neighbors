@@ -31,7 +31,8 @@ module sfu #(
     
 
     genvar k;
-    for (k=0;k<=col-1;k=k+1) begin
+    generate
+        for (k=0;k<=col-1;k=k+1) begin : sfp_out_assign
         
         // Accumulate
         assign temp_psum_w[((k+1)*psum_bw)-1:k*psum_bw] = new_acc_q ? psum_q[((k+1)*psum_bw)-1:k*psum_bw] : (psum_q[((k+1)*psum_bw)-1:k*psum_bw] + psum_in[((k+1)*psum_bw)-1:k*psum_bw]);
@@ -43,7 +44,9 @@ module sfu #(
 
         assign psum_out[(k+1)*psum_bw-1:k*psum_bw] = mode_q ? temp_relu_only_psum_w[((k+1)*psum_bw)-1:k*psum_bw] : temp_relu_psum_w[((k+1)*psum_bw)-1:k*psum_bw];
         
-    end
+        end
+    endgenerate
+    
 
     integer j;
     always @(posedge clk, posedge reset) begin

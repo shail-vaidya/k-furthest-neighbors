@@ -1,0 +1,13 @@
+./verilog/common_ip/fifo_mux_2_1.v
+./verilog/common_ip/fifo_mux_8_1.v
+./verilog/common_ip/fifo_mux_16_1.v
+./verilog/common_ip/fifo_depth8.v
+./verilog/common_ip/fifo_depth16.v
+./verilog/L0/l0.v
+./verilog/OFIFO/ofifo.v
+./verilog/PE_array/mac.v
+./verilog/PE_array/reconf_mac_tile.v
+./verilog/PE_array/mac_row.v
+./verilog/PE_array/mac_array.v
+./verilog/corelet.v
+./verilog/SFU/sfu.v
