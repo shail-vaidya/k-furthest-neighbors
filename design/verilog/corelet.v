@@ -35,9 +35,10 @@ module corelet #(
     input   [bw*row-1:0]        ififo_wdata,
     output                      ififo_ready,
     // SFP Ports
-    input   [psum_bw*col-1:0]        sfp_psum_i,
-    input                            sfp_acc_i,
-    output  [psum_bw*col-1:0]        sfp_out
+    input   [psum_bw*col-1:0]   sfp_psum_i,
+    input                       sfp_acc_i,
+    input                       sfp_psum_bypass,
+    output  [psum_bw*col-1:0]   sfp_out
 );
 
 //*************************************************************
@@ -48,14 +49,13 @@ wire [psum_bw*col-1:0]  ofifo_wdata;
 wire [bw*col-1:0]       ififo_rdata;
 wire [psum_bw*col-1:0]  in_n;
 wire [bw*row-1:0]       l0_rdata;
-
-//*************************************************************
-//                      Stubbing (To be removed)
-//*************************************************************
+wire [psum_bw*col-1:0]  sfp_psum_muxed;
 
 //*************************************************************
 //                      Misc  Logic
 //*************************************************************
+assign sfp_psum_muxed = sfp_acc_i ? sfp_psum_i : ofifo_rdata;
+
 genvar i;
     generate
     for (i=0; i < col ; i=i+1) begin : corelet_in_n_connection
@@ -142,11 +142,12 @@ sfu #(
     .col    (8),
     .row    (8)
 ) sfu_inst (
-    .clk        (clk),
-    .reset      (reset),
-    .acc_i      (sfp_acc_i),
-    .psum_in    (sfp_psum_i),
-    .psum_out   (sfp_out)
+    .clk            (clk),
+    .reset          (reset),
+    .acc_i          (sfp_acc_i),
+    .psum_bypass_i  (sfp_psum_bypass),
+    .psum_in        (sfp_psum_i),
+    .psum_out       (sfp_out)
 );
 
 
