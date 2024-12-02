@@ -70,14 +70,15 @@ wire ofifo_valid;
 wire [col*psum_bw-1:0] sfp_out;
 wire l0_ready;
 wire ififo_ready;
-wire psum_bypass_q;
+reg psum_bypass_q =0;
+reg psum_bypass =0;
 
 integer x_file, x_scan_file ; // file_handler
 integer w_file, w_scan_file ; // file_handler
 integer acc_file, acc_scan_file ; // file_handler
 integer out_file, out_scan_file ; // file_handler
 integer captured_data; 
-integer t, i, j, k, kij, m;
+integer t, i, j, k, kij, m, n;
 integer error;
 
 //  inst[49]      = acc_q;
@@ -286,11 +287,25 @@ initial begin
     t = t - 1;
   end
   
-  #1
+  #1;
   mode = 1;
   execute = 0;
   load = 0;
-  #1
+  n = 8;
+
+  while (n>0) begin
+    if (ofifo_valid) begin
+      $display("found ofifo_valid high. reading now");
+      #1;
+      ofifo_rd = 1;
+      n = n-1;
+    end
+    else
+      #1;
+  end
+  #1;
+  ofifo_rd = 0;
+  
 
 //End of load and execute sequence for output stationary
 
@@ -394,6 +409,7 @@ always @ (posedge clk) begin
    ififo_rd_q <= ififo_rd;
    l0_rd_q    <= l0_rd;
    l0_wr_q    <= l0_wr ;
+   psum_bypass_q <= psum_bypass;
 
    mode_s1_q  <= mode;
    mode_s2_q  <= mode_s1_q;
@@ -414,7 +430,7 @@ always @(negedge clk ) begin
 //FIXME: Adding ififo_rd condition for output stationary
   ififo_rd <= ififo_wr;
 //FIXME: Adding ofifo_rd to take ofifo_valid
-  ofifo_rd <= ofifo_valid;
+//  ofifo_rd <= ofifo_valid;
 end
 
 
