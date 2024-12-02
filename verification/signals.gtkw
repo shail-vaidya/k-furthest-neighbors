@@ -1,0 +1,111 @@
+[*]
+[*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
+[*] Mon Dec 02 20:52:49 2024
+[*]
+[dumpfile] "E:\UCSD\Fall 2024\ECE 284\k-furthest-neighbors\verification\core_tb.vcd"
+[dumpfile_mtime] "Mon Dec 02 20:41:37 2024"
+[dumpfile_size] 7461577
+[savefile] "E:\UCSD\Fall 2024\ECE 284\k-furthest-neighbors\verification\signals.gtkw"
+[timestart] 0
+[size] 1440 829
+[pos] -1 -1
+*-18.056896 158000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] core_tb.
+[treeopen] core_tb.core_instance.
+[treeopen] core_tb.core_instance.corelet_inst.
+[treeopen] core_tb.core_instance.corelet_inst.mac_array_inst.mac_array_row_num[1].
+[treeopen] core_tb.core_instance.corelet_inst.mac_array_inst.mac_array_row_num[1].mac_row_instance.
+[treeopen] core_tb.core_instance.corelet_inst.mac_array_inst.mac_array_row_num[1].mac_row_instance.mac_row_col_num[1].
+[treeopen] core_tb.core_instance.corelet_inst.mac_array_inst.mac_array_row_num[1].mac_row_instance.mac_row_col_num[2].
+[treeopen] core_tb.core_instance.corelet_inst.mac_array_inst.mac_array_row_num[1].mac_row_instance.mac_row_col_num[3].
+[treeopen] core_tb.core_instance.corelet_inst.mac_array_inst.mac_array_row_num[1].mac_row_instance.mac_row_col_num[4].
+[treeopen] core_tb.core_instance.corelet_inst.mac_array_inst.mac_array_row_num[1].mac_row_instance.mac_row_col_num[5].
+[treeopen] core_tb.core_instance.corelet_inst.mac_array_inst.mac_array_row_num[1].mac_row_instance.mac_row_col_num[6].
+[treeopen] core_tb.core_instance.corelet_inst.mac_array_inst.mac_array_row_num[1].mac_row_instance.mac_row_col_num[7].
+[treeopen] core_tb.core_instance.corelet_inst.mac_array_inst.mac_array_row_num[1].mac_row_instance.mac_row_col_num[8].
+[sst_width] 250
+[signals_width] 435
+[sst_expanded] 1
+[sst_vpaned_height] 234
+@28
+core_tb.core_instance.clk
+core_tb.core_instance.reset
+@200
+-XMEM
+@28
+core_tb.core_instance.xmem_inst.CEN0
+core_tb.core_instance.xmem_inst.WEN0
+@22
+core_tb.core_instance.xmem_inst.A0[7:0]
+core_tb.core_instance.xmem_inst.D0[31:0]
+core_tb.core_instance.xmem_inst.Q0[31:0]
+@28
+core_tb.core_instance.xmem_inst.CEN1
+core_tb.core_instance.xmem_inst.WEN1
+@22
+core_tb.core_instance.xmem_inst.A1[7:0]
+core_tb.core_instance.xmem_inst.D1[31:0]
+core_tb.core_instance.xmem_inst.Q1[31:0]
+@200
+-L0
+@28
+core_tb.core_instance.corelet_inst.l0_inst.wr
+@22
+core_tb.core_instance.corelet_inst.l0_inst.in[31:0]
+@28
+core_tb.core_instance.corelet_inst.l0_inst.rd
+@22
+core_tb.core_instance.corelet_inst.l0_inst.out[31:0]
+@28
+core_tb.core_instance.corelet_inst.l0_inst.o_ready
+@200
+-IFIFO
+@28
+core_tb.core_instance.corelet_inst.ififo_inst.wr
+@22
+core_tb.core_instance.corelet_inst.ififo_inst.in[31:0]
+@28
+core_tb.core_instance.corelet_inst.ififo_inst.rd
+@22
+core_tb.core_instance.corelet_inst.ififo_inst.out[31:0]
+@28
+core_tb.core_instance.corelet_inst.ififo_inst.o_ready
+@200
+-PE ARRAY
+@28
+core_tb.core_instance.corelet_inst.mac_array_inst.inst_w[2:0]
+@22
+core_tb.core_instance.corelet_inst.mac_array_inst.in_w[31:0]
+core_tb.core_instance.corelet_inst.mac_array_inst.in_n[127:0]
+core_tb.core_instance.corelet_inst.mac_array_inst.valid[7:0]
+@200
+-OFIFO
+@22
+core_tb.core_instance.corelet_inst.ofifo_inst.wr[7:0]
+core_tb.core_instance.corelet_inst.ofifo_inst.in[127:0]
+@28
+core_tb.core_instance.corelet_inst.ofifo_inst.rd
+@22
+core_tb.core_instance.corelet_inst.ofifo_inst.out[127:0]
+@28
+core_tb.core_instance.corelet_inst.ofifo_inst.o_ready
+@200
+-PMEM
+@28
+core_tb.core_instance.pmem_inst.CEN
+core_tb.core_instance.pmem_inst.WEN
+@22
+core_tb.core_instance.pmem_inst.A[8:0]
+core_tb.core_instance.pmem_inst.D[127:0]
+core_tb.core_instance.pmem_inst.Q[127:0]
+@200
+-SFP
+@28
+core_tb.core_instance.corelet_inst.sfu_inst.acc_i
+core_tb.core_instance.corelet_inst.sfu_inst.psum_bypass_i
+@22
+core_tb.core_instance.corelet_inst.sfu_inst.psum_in[127:0]
+@23
+core_tb.core_instance.corelet_inst.sfu_inst.psum_out[127:0]
+[pattern_trace] 1
+[pattern_trace] 0

@@ -48,6 +48,7 @@ reg mode_q = 0;
 reg mode_s1_q = 0;
 reg mode_s2_q = 0;
 reg acc_q = 0;
+reg acc_s1_q = 0;
 reg acc = 0;
 reg psum_bypass = 0;
 reg psum_bypass_q = 0;
@@ -80,7 +81,7 @@ integer pmem_file, pmem_scan_file; //file_handler
 integer acc_file, acc_scan_file ; // file_handler
 integer out_file, out_scan_file ; // file_handler
 integer captured_data; 
-integer t, i, j, k, kij, m, n, ic_nij, oc_nij, ic;
+integer t, i, j, k, kij, m, n, m2, n2, ic_nij, oc_nij, ic;
 integer error;
 
 
@@ -229,8 +230,8 @@ initial begin
   psum_bypass = 1;
   $display("Starting Load and Execute");
   fork
+    //---------------------------------- Load and Execute --------------------------------------------------
     begin
-      //---------------------------------- Load and Execute --------------------------------------------------
       for (kij=0; kij<len_kij; kij=kij+1) begin 
         t = col;
         while (t > 0) begin
@@ -276,96 +277,103 @@ initial begin
           end
         end
         #1;
-        load = 1;
-        execute = 1;
+        load = 0;
+        execute = 0;
         mode = 1;
         CEN0_xmem = 1;
         WEN0_xmem = 1;
         $display("Finished Load and Execute for kij-%2d",kij);
-        #1
-        load = 0;
-        execute = 0;
-        mode = 0;
-        #19;
       end
       #1;
       load = 0;
       execute = 0;
       mode = 0; 
-      end
+    end
+    //---------------------------------- O-FIFO polling and storing in PMEM --------------------------------------------------
     begin
-        //---------------------------------- O-FIFO polling and comparing PSUMs --------------------------------------------------
-        m=len_nij*len_kij;
-        n = len_nij;
-        pmem_file = $fopen("WS_psum.txt", "r");  
-        error = 0;
-        while (m > 0) begin
-          if(ofifo_valid) begin
-            if(n>0) begin
-              CEN_pmem = 0;
-              WEN_pmem = 0;
-              if (m < len_nij * len_kij) begin
-                A_pmem = A_pmem + 1;
-              end
-              if(ofifo_valid_q) begin
-                pmem_scan_file = $fscanf(pmem_file,"%128b", answer);
-                if (answer == sfp_out) begin
-                  $display("psum for nij = %2d matched! :D", len_nij - n);
-                end
-                else begin
-                  $display("psum for nij = %2d data ERROR!!", len_nij - n); 
-                  $display("sfpout: %128b", sfp_out);
-                  $display("answer: %128b", answer);
-                  $display("error cycle: %2d", (len_kij*len_nij - m));
-                  error = error + 1;
-                end
-              end
-              m=m-1;
-              n=n-1;
+      m=len_nij*len_kij;
+      n = len_nij;
+      error = 0;
+      while (m > 0) begin
+        if(ofifo_valid) begin
+          if(n>0) begin
+            CEN_pmem = 0;
+            WEN_pmem = 0;
+            if (m < len_nij * len_kij) begin
+              A_pmem = A_pmem + 1;
             end
+            m=m-1;
+            n=n-1;
             if(m%len_nij == 0) begin
               $display("Populated all psums for kij-%2d in PMEM",((len_nij*len_kij-m)/len_nij)-1);
-              
             end
-            #1;
           end
-          else begin
-            CEN_pmem = 1;
-            WEN_pmem = 1;
-            n = len_nij;
-            #1; 
-          end
+          #1;
+        end
+        else begin
+          CEN_pmem = 1;
+          WEN_pmem = 1;
+          n = len_nij;
+          #1; 
+        end
         end
         #1;
         CEN_pmem = 1;
         WEN_pmem = 1; 
         $display("Total number of errors : %2d", error);
     end
+    //---------------------------------- Comparing PSUMs --------------------------------------------------
+    begin
+      m2=len_nij*len_kij;
+      n2 = len_nij;
+      pmem_file = $fopen("WS_psum.txt", "r");  
+      error = 0;
+      while (m2 > 0) begin
+        if(ofifo_valid) begin
+          #1;
+          if(n2>0) begin
+            pmem_scan_file = $fscanf(pmem_file,"%128b", answer);
+            if (answer == sfp_out) begin
+              $display("psum for kij = %2d nij = %2d matched! :D",((len_nij*len_kij-m2)/len_nij), len_nij - n2);
+            end
+            else begin
+              $display("psum for kij = %2d nij = %2d data ERROR!!",((len_nij*len_kij-m2)/len_nij), len_nij - n2); 
+              //$display("sfpout: %128b", sfp_out);
+              //$display("answer: %128b", answer);
+              //$display("error cycle: %2d", (len_kij*len_nij - m));
+              error = error + 1;
+            end
+            m2=m2-1;
+            n2=n2-1;
+          end
+        end
+        else begin
+          #1;
+          n2 = len_nij; 
+        end
+      end
+      #1;
+      CEN_pmem = 1;
+      WEN_pmem = 1; 
+      $display("Total number of errors : %2d", error);
+    end
   join
   #1;
   psum_bypass = 0;
   
-        
-    //////// OFIFO READ ////////
-    // Ideally, OFIFO should be read while execution, but we have enough ofifo
-    // depth so we can fetch out after execution.
-    //...
-    /////////////////////////////////////
-// Reading from pmem //
+//---------------------------------- Accumularing PSUMs and comparing final output --------------------------------------------------        
 for (oc_nij = 0; oc_nij < 16; oc_nij = oc_nij + 1)
-#1
   begin
-    acc = 0;
-    CEN_pmem = 0;
     ic_nij = ((oc_nij/4)*6) + (oc_nij % 4);
-    for (k = 0; k < 9; k = k+ 1)
-      begin
-         #1
-         ic = ic_nij + ((6*(k/3)) + (k % 3));
-         A_pmem = (k * 36) + (ic);
-         #1
-         acc = 1;
-      end
+    for (k = 0; k < 9; k = k+ 1) begin
+        ic = ic_nij + ((6*(k/3)) + (k % 3));
+        acc = 1;
+        CEN_pmem = 0;
+        A_pmem = (k * 36) + (ic);
+        #1;
+    end
+    acc = 0;
+    #1;
   end
 
 
@@ -455,7 +463,8 @@ always @ (posedge clk) begin
    CEN_pmem_q <= CEN_pmem;
    WEN_pmem_q <= WEN_pmem;
    ofifo_rd_q <= ofifo_rd;
-   acc_q      <= acc;
+   acc_s1_q      <= acc;
+   acc_q      <= acc_s1_q;
    ififo_wr_q <= ififo_wr;
    ififo_rd_q <= ififo_rd;
    l0_rd_q    <= l0_rd;
