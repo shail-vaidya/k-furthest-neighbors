@@ -79,7 +79,7 @@ always @ (posedge clk or posedge reset) begin
 					c_q <= c_pipe_q;
 				end
 			end
-			else if (inst_w[1:0] == 2'b11) begin // RESET
+			else if (inst_w[1:0] == 2'b00) begin // RESET
 				a_q 		<= {bw{1'b0}};
 				b_q 		<= {bw{1'b0}};
 				c_q 		<= {psum_bw{1'b0}};
