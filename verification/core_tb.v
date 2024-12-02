@@ -6,11 +6,11 @@ module core_tb;
 
 parameter bw = 4;
 parameter psum_bw = 16;
-parameter len_kij = 9;
+parameter len_kij = 1;
 parameter len_onij = 16;
 parameter col = 8;
 parameter row = 8;
-parameter len_nij = 36;
+parameter len_nij = 64;
 reg clk = 1;
 reg reset = 1;
 //FIXME: Why was this updated to 50?
@@ -68,6 +68,7 @@ reg load;
 reg [8*30:1] stringvar;
 reg [8*30:1] w_file_name;
 wire ofifo_valid;
+reg ofifo_valid_q;
 wire [col*psum_bw-1:0] sfp_out;
 wire l0_ready;
 wire ififo_ready;
@@ -158,8 +159,8 @@ initial begin
   $dumpfile("core_tb.vcd");
   $dumpvars(0,core_tb);
 
-  //x_file = $fopen("activation_tile0.txt", "r");
-  x_file = $fopen("WS_activation.txt", "r");
+  x_file = $fopen("activation.txt", "r");
+  //x_file = $fopen("WS_activation.txt", "r");
   // Following three lines are to remove the first three comment lines of the file
   x_scan_file = $fscanf(x_file,"%s", captured_data);
   x_scan_file = $fscanf(x_file,"%s", captured_data);
@@ -189,10 +190,11 @@ initial begin
   //-----------------------------------------------------------------------------------------------------------------
 
   $display("Writing Weight Data to XMEM");
-  for (kij=0; kij<9; kij=kij+1) begin  // Weight loading to SRAM loop
+  for (kij=0; kij<1; kij=kij+1) begin  // Weight loading to SRAM loop
 
     case(kij)
-      0: w_file_name = "WS_weight_kij0.txt";
+      0: w_file_name = "weight.txt";
+      /*0: w_file_name = "WS_weight_kij0.txt";
       1: w_file_name = "WS_weight_kij1.txt";
       2: w_file_name = "WS_weight_kij2.txt";
       3: w_file_name = "WS_weight_kij3.txt";
@@ -200,7 +202,7 @@ initial begin
       5: w_file_name = "WS_weight_kij5.txt";
       6: w_file_name = "WS_weight_kij6.txt";
       7: w_file_name = "WS_weight_kij7.txt";
-      8: w_file_name = "WS_weight_kij8.txt";
+      8: w_file_name = "WS_weight_kij8.txt";*/
     endcase
 
     w_file = $fopen(w_file_name, "r");
@@ -296,7 +298,7 @@ initial begin
         //---------------------------------- O-FIFO polling and comparing PSUMs --------------------------------------------------
         m=len_nij*len_kij;
         n = len_nij;
-        pmem_file = $fopen("WS_psum.txt", "r");  
+        pmem_file = $fopen("psum.txt", "r");  
         pmem_scan_file = $fscanf(pmem_file,"%s", answer); 
         pmem_scan_file = $fscanf(pmem_file,"%s", answer); 
         pmem_scan_file = $fscanf(pmem_file,"%s", answer); 
@@ -306,18 +308,21 @@ initial begin
             if(n>0) begin
               CEN_pmem = 0;
               WEN_pmem = 0;
-              pmem_scan_file = $fscanf(pmem_file,"%128b", answer);
-              if (answer == sfp_out)
-                $display("psum for nij = %2d matched! :D", len_nij - n);
-              else begin
-                $display("psum for nij = %2d data ERROR!!", len_nij - n); 
-                //$display("sfpout: %128b", sfp_out);
-                //$display("answer: %128b", answer);
-                $display("error cycle: %2d", (len_kij*len_nij - m));
-                error = error + 1;
-              end
               if (m < len_nij * len_kij) begin
                 A_pmem = A_pmem + 1;
+              end
+              if(ofifo_valid_q) begin
+                pmem_scan_file = $fscanf(pmem_file,"%128b", answer);
+                if (answer == sfp_out) begin
+                  $display("psum for nij = %2d matched! :D", len_nij - n);
+                end
+                else begin
+                  $display("psum for nij = %2d data ERROR!!", len_nij - n); 
+                  $display("sfpout: %128b", sfp_out);
+                  $display("answer: %128b", answer);
+                  $display("error cycle: %2d", (len_kij*len_nij - m));
+                  error = error + 1;
+                end
               end
               m=m-1;
               n=n-1;
@@ -445,7 +450,7 @@ always @ (posedge clk) begin
    l0_rd_q    <= l0_rd;
    l0_wr_q    <= l0_wr ;
    psum_bypass_q <= psum_bypass;
-
+   ofifo_valid_q <= ofifo_valid;
    mode_s1_q  <= mode;
    mode_s2_q  <= mode_s1_q;
    load_s1_q  <= load;
