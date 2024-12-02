@@ -77,10 +77,11 @@ wire ofifo_rd;
 
 integer x_file, x_scan_file ; // file_handler
 integer w_file, w_scan_file ; // file_handler
+integer o_file, o_scan_file ; // file_handler
 integer pmem_file, pmem_scan_file; //file_handler
 integer acc_file, acc_scan_file ; // file_handler
 integer out_file, out_scan_file ; // file_handler
-integer captured_data; 
+integer captured_data, output_data;
 integer t, i, j, k, kij, m, n, m2, n2, ic_nij, oc_nij, ic;
 integer error;
 
@@ -362,6 +363,12 @@ initial begin
   psum_bypass = 0;
   
 //---------------------------------- Accumularing PSUMs and comparing final output --------------------------------------------------        
+o_file = $fopen("WS_out.txt", "r");
+error = 0;
+// Following three lines are to remove the first three comment lines of the file
+o_scan_file = $fscanf(o_file,"%s", output_data);
+o_scan_file = $fscanf(o_file,"%s", output_data);
+o_scan_file = $fscanf(o_file,"%s", output_data);
 for (oc_nij = 0; oc_nij < 16; oc_nij = oc_nij + 1)
   begin
     ic_nij = ((oc_nij/4)*6) + (oc_nij % 4);
@@ -372,83 +379,21 @@ for (oc_nij = 0; oc_nij < 16; oc_nij = oc_nij + 1)
         A_pmem = (k * 36) + (ic);
         #1;
     end
+    CEN_pmem = 1;
     acc = 0;
-    #1;
+    #0.5;
+    o_scan_file = $fscanf(o_file,"%128b", answer);
+    if (answer == sfp_out) begin
+      $display("Output for oc_nij = %2d matched! :D",oc_nij);
+    end
+    else begin
+      $display("psum for oc_nij = %2d data ERROR!!",oc_nij); 
+      error = error + 1;
+    end
+    #0.5;
   end
 
-
-
-//COMMENTING OUT BELOW TB FOR NOW//
-
-
-//  ////////// Accumulation /////////
-//  out_file = $fopen("out.txt", "r");  
-//
-//  // Following three lines are to remove the first three comment lines of the file
-//  out_scan_file = $fscanf(out_file,"%s", answer); 
-//  out_scan_file = $fscanf(out_file,"%s", answer); 
-//  out_scan_file = $fscanf(out_file,"%s", answer); 
-//
-//  error = 0;
-//
-//
-//
-//  $display("############ Verification Start during accumulation #############"); 
-//
-//  for (i=0; i<len_onij+1; i=i+1) begin 
-//
-//    #0.5 clk = 1'b0; 
-//    #0.5 clk = 1'b1; 
-//
-//    if (i>0) begin
-//     out_scan_file = $fscanf(out_file,"%128b", answer); // reading from out file to answer
-//       if (sfp_out == answer)
-//         $display("%2d-th output featuremap Data matched! :D", i); 
-//       else begin
-//         $display("%2d-th output featuremap Data ERROR!!", i); 
-//         $display("sfpout: %128b", sfp_out);
-//         $display("answer: %128b", answer);
-//         error = 1;
-//       end
-//    end
-//   
-// 
-//    #0.5 clk = 1'b0; reset = 1;
-//    #0.5 clk = 1'b1;  
-//    #0.5 clk = 1'b0; reset = 0; 
-//    #0.5 clk = 1'b1;  
-//
-//    for (j=0; j<len_kij+1; j=j+1) begin 
-//
-//      #0.5 clk = 1'b0;   
-//        if (j<len_kij) begin CEN_pmem = 0; WEN_pmem = 1; acc_scan_file = $fscanf(acc_file,"%11b", A_pmem); end
-//                       else  begin CEN_pmem = 1; WEN_pmem = 1; end
-//
-//        if (j>0)  acc = 1;  
-//      #0.5 clk = 1'b1;   
-//    end
-//
-//    #0.5 clk = 1'b0; acc = 0;
-//    #0.5 clk = 1'b1; 
-//  end
-//
-//
-//  if (error == 0) begin
-//  	$display("############ No error detected ##############"); 
-//  	$display("########### Project Completed !! ############"); 
-//
-//  end
-//
-//  $fclose(acc_file);
-//  //////////////////////////////////
-//
-//  for (t=0; t<10; t=t+1) begin  
-//    #0.5 clk = 1'b0;  
-//    #0.5 clk = 1'b1;  
-//  end
-//
 #100 $finish;
-//
 end
 
 always @ (posedge clk) begin
