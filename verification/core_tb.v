@@ -10,7 +10,7 @@ parameter len_kij = 9;
 parameter len_onij = 16;
 parameter col = 8;
 parameter row = 8;
-parameter len_nij = 36;
+parameter len_nij = 2;
 reg clk = 1;
 reg reset = 1;
 //FIXME: Why was this updated to 50?
@@ -73,6 +73,7 @@ wire ofifo_rd;
 
 integer x_file, x_scan_file ; // file_handler
 integer w_file, w_scan_file ; // file_handler
+integer pmem_file, pmem_scan_file; //file_handler
 integer acc_file, acc_scan_file ; // file_handler
 integer out_file, out_scan_file ; // file_handler
 integer captured_data; 
@@ -221,6 +222,7 @@ initial begin
   $display("Starting Load and Execute");
   fork
     begin
+      //---------------------------------- Load and Execute --------------------------------------------------
       for (kij=0; kij<len_kij; kij=kij+1) begin 
         t = col;
         while (t > 0) begin
@@ -284,14 +286,29 @@ initial begin
       mode = 0; 
       end
     begin
-        //m=len_nij*2;
-        m=len_nij*len_kij; //36*9
+        //---------------------------------- O-FIFO polling and comparing PSUMs --------------------------------------------------
+        m=len_nij*len_kij;
         n = len_nij;
+        pmem_file = $fopen("WS_psum.txt", "r");  
+        pmem_scan_file = $fscanf(pmem_file,"%s", answer); 
+        pmem_scan_file = $fscanf(pmem_file,"%s", answer); 
+        pmem_scan_file = $fscanf(pmem_file,"%s", answer); 
+        error = 0;
         while (m > 0) begin
           if(ofifo_valid) begin
             if(n>0) begin
               CEN_pmem = 0;
               WEN_pmem = 0;
+              pmem_scan_file = $fscanf(pmem_file,"%128b", answer);
+              if (answer == sfp_out)
+                $display("psum for nij = %2d matched! :D", n);
+              else begin
+                $display("psum for nij = %2d data ERROR!!", n); 
+                $display("sfpout: %128b", sfp_out);
+                $display("answer: %128b", answer);
+                $display("error cycle: %2d", (len_kij*len_nij - m));
+                error = error + 1;
+              end
               if (m < len_nij * len_kij) begin
                 A_pmem = A_pmem + 1;
               end
@@ -300,6 +317,7 @@ initial begin
             end
             if(m%len_nij == 0) begin
               $display("Populated all psums for kij-%2d in PMEM",((len_nij*len_kij-m)/len_nij)-1);
+              
             end
             #1;
           end
@@ -313,6 +331,7 @@ initial begin
         #1;
         CEN_pmem = 1;
         WEN_pmem = 1; 
+        $display("Total number of errors : %2d", error);
     end
   join
   
