@@ -300,7 +300,7 @@ initial begin
   $display("############ Verification Start during accumulation #############"); 
 
   n = 8+1;
-
+//DELAY READING ANSWER BY A CYCLE!!
   while (n>0) begin
     if (ofifo_valid & (n>1)) begin
       $display("found ofifo_valid high. reading now");
@@ -308,8 +308,11 @@ initial begin
       ofifo_rd = 1;
       n = n-1;
       out_scan_file = $fscanf(out_file,"%128b", answer);
-      if (sfp_out == answer)
+      if (sfp_out == answer) begin
         $display("%2d-th output featuremap Data matched! :D", n);
+        $display("sfpout: %128b", sfp_out);
+        $display("answer: %128b", answer);
+      end
       else begin
         $display("%2d-th output featuremap Data ERROR!!", n); 
         $display("sfpout: %128b", sfp_out);
@@ -319,10 +322,14 @@ initial begin
     end
     else if (ofifo_valid & (n==1)) begin
       #1;
+      ofifo_rd = 0;
       n = n-1;
       out_scan_file = $fscanf(out_file,"%128b", answer);
-      if (sfp_out == answer)
+      if (sfp_out == answer) begin
         $display("%2d-th output featuremap Data matched! :D", n);
+        $display("sfpout: %128b", sfp_out);
+        $display("answer: %128b", answer);
+      end
       else begin
         $display("%2d-th output featuremap Data ERROR!!", n); 
         $display("sfpout: %128b", sfp_out);
@@ -335,7 +342,6 @@ initial begin
   end
 
   #1;
-  ofifo_rd = 0;
   if (error == 0) begin
   	$display("############ No error detected ##############"); 
   	$display("########### Project Completed !! ############"); 
