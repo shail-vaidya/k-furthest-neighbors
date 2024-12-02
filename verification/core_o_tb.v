@@ -291,20 +291,56 @@ initial begin
   mode = 1;
   execute = 0;
   load = 0;
-  n = 8;
+  
+  out_file = $fopen("output_stationary_out.txt", "r");  
+  out_scan_file = $fscanf(out_file,"%s", answer); 
+  out_scan_file = $fscanf(out_file,"%s", answer); 
+  out_scan_file = $fscanf(out_file,"%s", answer); 
+  error = 0;
+  $display("############ Verification Start during accumulation #############"); 
+
+  n = 8+1;
 
   while (n>0) begin
-    if (ofifo_valid) begin
+    if (ofifo_valid & (n>1)) begin
       $display("found ofifo_valid high. reading now");
       #1;
       ofifo_rd = 1;
       n = n-1;
+      out_scan_file = $fscanf(out_file,"%128b", answer);
+      if (sfp_out == answer)
+        $display("%2d-th output featuremap Data matched! :D", n);
+      else begin
+        $display("%2d-th output featuremap Data ERROR!!", n); 
+        $display("sfpout: %128b", sfp_out);
+        $display("answer: %128b", answer);
+        error = 1;
+      end
+    end
+    else if (ofifo_valid & (n==1)) begin
+      #1;
+      n = n-1;
+      out_scan_file = $fscanf(out_file,"%128b", answer);
+      if (sfp_out == answer)
+        $display("%2d-th output featuremap Data matched! :D", n);
+      else begin
+        $display("%2d-th output featuremap Data ERROR!!", n); 
+        $display("sfpout: %128b", sfp_out);
+        $display("answer: %128b", answer);
+        error = 1;
+      end
     end
     else
       #1;
   end
+
   #1;
   ofifo_rd = 0;
+  if (error == 0) begin
+  	$display("############ No error detected ##############"); 
+  	$display("########### Project Completed !! ############"); 
+  end
+
   
 
 //End of load and execute sequence for output stationary
@@ -323,39 +359,39 @@ initial begin
 
 
 //  ////////// Accumulation /////////
-  out_file = $fopen("out.txt", "r");  
+//  out_file = $fopen("output_stationary_out.txt", "r");  
 //
 //  // Following three lines are to remove the first three comment lines of the file
-  out_scan_file = $fscanf(out_file,"%s", answer); 
-  out_scan_file = $fscanf(out_file,"%s", answer); 
-  out_scan_file = $fscanf(out_file,"%s", answer); 
+//  out_scan_file = $fscanf(out_file,"%s", answer); 
+//  out_scan_file = $fscanf(out_file,"%s", answer); 
+//  out_scan_file = $fscanf(out_file,"%s", answer); 
 //
-  error = 0;
+//  error = 0;
 //
 //
 //
-  $display("############ Verification Start during accumulation #############"); 
+//  $display("############ Verification Start during accumulation #############"); 
 //
-  for (i=0; i<len_nij+1; i=i+1) begin 
-    #1;
-    if (i>0) begin
-      out_scan_file = $fscanf(out_file,"%128b", answer);
-      if (sfp_out == answer)
-        $display("%2d-th output featuremap Data matched! :D", i);
-      else begin
-        $display("%2d-th output featuremap Data ERROR!!", i); 
-        $display("sfpout: %128b", sfp_out);
-        $display("answer: %128b", answer);
-        error = 1;
-      end
-    end
-
-  end
-
-  if (error == 0) begin
-  	$display("############ No error detected ##############"); 
-  	$display("########### Project Completed !! ############"); 
-  end
+//  for (i=0; i<len_nij+1; i=i+1) begin 
+//    #1;
+//    if (i>0) begin
+//      out_scan_file = $fscanf(out_file,"%128b", answer);
+//      if (sfp_out == answer)
+//        $display("%2d-th output featuremap Data matched! :D", i);
+//      else begin
+//        $display("%2d-th output featuremap Data ERROR!!", i); 
+//        $display("sfpout: %128b", sfp_out);
+//        $display("answer: %128b", answer);
+//        error = 1;
+//      end
+//    end
+//
+//  end
+//
+//  if (error == 0) begin
+//  	$display("############ No error detected ##############"); 
+//  	$display("########### Project Completed !! ############"); 
+//  end
 //
 //    #0.5 clk = 1'b0; 
 //    #0.5 clk = 1'b1; 
