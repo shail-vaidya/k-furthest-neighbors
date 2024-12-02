@@ -48,6 +48,7 @@ reg mode_q = 0;
 reg mode_s1_q = 0;
 reg mode_s2_q = 0;
 reg acc_q = 0;
+reg acc_s1_q = 0;
 reg acc = 0;
 reg psum_bypass = 0;
 reg psum_bypass_q = 0;
@@ -292,7 +293,6 @@ initial begin
     begin
       m=len_nij*len_kij;
       n = len_nij;
-      //pmem_file = $fopen("WS_psum.txt", "r");  
       error = 0;
       while (m > 0) begin
         if(ofifo_valid) begin
@@ -302,17 +302,6 @@ initial begin
             if (m < len_nij * len_kij) begin
               A_pmem = A_pmem + 1;
             end
-            //pmem_scan_file = $fscanf(pmem_file,"%128b", answer);
-            //if (answer == sfp_out) begin
-            //  $display("psum for kij = %2d nij = %2d matched! :D",((len_nij*len_kij-m)/len_nij), len_nij - n);
-            //end
-            //else begin
-            //  $display("psum for kij = %2d nij = %2d data ERROR!!",((len_nij*len_kij-m)/len_nij), len_nij - n); 
-            //  //$display("sfpout: %128b", sfp_out);
-            //  //$display("answer: %128b", answer);
-            //  //$display("error cycle: %2d", (len_kij*len_nij - m));
-            //  error = error + 1;
-            //end
             m=m-1;
             n=n-1;
             if(m%len_nij == 0) begin
@@ -372,27 +361,19 @@ initial begin
   #1;
   psum_bypass = 0;
   
-        
-    //////// OFIFO READ ////////
-    // Ideally, OFIFO should be read while execution, but we have enough ofifo
-    // depth so we can fetch out after execution.
-    //...
-    /////////////////////////////////////
-// Reading from pmem //
+//---------------------------------- Accumularing PSUMs and comparing final output --------------------------------------------------        
 for (oc_nij = 0; oc_nij < 16; oc_nij = oc_nij + 1)
-#1
   begin
-    acc = 0;
-    CEN_pmem = 0;
     ic_nij = ((oc_nij/4)*6) + (oc_nij % 4);
-    for (k = 0; k < 9; k = k+ 1)
-      begin
-         #1
-         ic = ic_nij + ((6*(k/3)) + (k % 3));
-         A_pmem = (k * 36) + (ic);
-         #1
-         acc = 1;
-      end
+    for (k = 0; k < 9; k = k+ 1) begin
+        ic = ic_nij + ((6*(k/3)) + (k % 3));
+        acc = 1;
+        CEN_pmem = 0;
+        A_pmem = (k * 36) + (ic);
+        #1;
+    end
+    acc = 0;
+    #1;
   end
 
 
@@ -482,7 +463,8 @@ always @ (posedge clk) begin
    CEN_pmem_q <= CEN_pmem;
    WEN_pmem_q <= WEN_pmem;
    ofifo_rd_q <= ofifo_rd;
-   acc_q      <= acc;
+   acc_s1_q      <= acc;
+   acc_q      <= acc_s1_q;
    ififo_wr_q <= ififo_wr;
    ififo_rd_q <= ififo_rd;
    l0_rd_q    <= l0_rd;
