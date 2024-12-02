@@ -11,7 +11,7 @@ parameter len_onij = 16;
 parameter col = 8;
 parameter row = 8;
 //FIXME: Reducing len nij to take only 9 inputs first, later set to 72
-parameter len_nij = 4;
+parameter len_nij = 9;
 
 reg clk = 1;
 reg reset = 1;
