@@ -55,8 +55,8 @@ reg [1:0]  inst_w;
 reg [bw*row-1:0] D_xmem;
 reg [psum_bw*col-1:0] answer;
 
-//FIXME: setting ofifo_rd to be a wire
-//reg ofifo_rd;
+//FIXME: setting ofifo_rd to be a reg
+reg ofifo_rd;
 reg ififo_wr;
 reg ififo_rd;
 reg l0_rd;
@@ -70,7 +70,6 @@ wire ofifo_valid;
 wire [col*psum_bw-1:0] sfp_out;
 wire l0_ready;
 wire ififo_ready;
-wire ofifo_rd;
 wire psum_bypass_q;
 
 integer x_file, x_scan_file ; // file_handler
@@ -117,8 +116,6 @@ assign inst_q[3]  	  = l0_wr_q;
 assign inst_q[2]  	  = mode_q; 
 assign inst_q[1]  	  = execute_q; 
 assign inst_q[0]  	  = load_q; 
-//FIXME: setting ofifo_rd to be a wire
-assign ofifo_rd		= !CEN_pmem && !WEN_pmem;
 
 core  #(.bw(bw), .col(col), .row(row)) core_instance (
 	.clk(clk), 
@@ -276,17 +273,19 @@ initial begin
 
   t = 16;
   while (t > 0) begin
-  #1;
-	//Enter shifting sequence
-	mode = 1;
-	execute = 0;
-	load = 1;
-	CEN0_xmem = 1;
-	WEN0_xmem = 1;
-	CEN1_xmem = 1;
-	//WEN1_xmem is always 1
-	t = t - 1;
+    #1;
+    //Enter shifting sequence
+    mode = 1;
+    execute = 0;
+    load = 1;
+    CEN0_xmem = 1;
+    WEN0_xmem = 1;
+    CEN1_xmem = 1;
+    //WEN1_xmem is always 1
+    
+    t = t - 1;
   end
+  
   #1
   mode = 1;
   execute = 0;
@@ -413,7 +412,9 @@ always @(negedge clk ) begin
   ififo_wr <= ~CEN1_xmem_q;
   l0_rd <= l0_wr;
 //FIXME: Adding ififo_rd condition for output stationary
-  ififo_rd <= ififo_wr; 
+  ififo_rd <= ififo_wr;
+//FIXME: Adding ofifo_rd to take ofifo_valid
+  ofifo_rd <= ofifo_valid;
 end
 
 
