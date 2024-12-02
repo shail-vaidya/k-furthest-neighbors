@@ -80,7 +80,7 @@ integer pmem_file, pmem_scan_file; //file_handler
 integer acc_file, acc_scan_file ; // file_handler
 integer out_file, out_scan_file ; // file_handler
 integer captured_data; 
-integer t, i, j, k, kij, m, n;
+integer t, i, j, k, kij, m, n, ic_nij, oc_nij, ic;
 integer error;
 
 
@@ -351,7 +351,22 @@ initial begin
     // depth so we can fetch out after execution.
     //...
     /////////////////////////////////////
-
+// Reading from pmem //
+for (oc_nij = 0; oc_nij < 16; oc_nij = oc_nij + 1)
+#1
+  begin
+    acc = 0;
+    CEN_pmem = 0;
+    ic_nij = ((oc_nij/4)*6) + (oc_nij % 4);
+    for (k = 0; k < 9; k = k+ 1)
+      begin
+         #1
+         ic = ic_nij + ((6*(k/3)) + (k % 3));
+         A_pmem = (k * 36) + (ic);
+         #1
+         acc = 1;
+      end
+  end
 
 
 
