@@ -323,20 +323,39 @@ initial begin
 
 
 //  ////////// Accumulation /////////
-//  out_file = $fopen("out.txt", "r");  
+  out_file = $fopen("out.txt", "r");  
 //
 //  // Following three lines are to remove the first three comment lines of the file
-//  out_scan_file = $fscanf(out_file,"%s", answer); 
-//  out_scan_file = $fscanf(out_file,"%s", answer); 
-//  out_scan_file = $fscanf(out_file,"%s", answer); 
+  out_scan_file = $fscanf(out_file,"%s", answer); 
+  out_scan_file = $fscanf(out_file,"%s", answer); 
+  out_scan_file = $fscanf(out_file,"%s", answer); 
 //
-//  error = 0;
+  error = 0;
 //
 //
 //
-//  $display("############ Verification Start during accumulation #############"); 
+  $display("############ Verification Start during accumulation #############"); 
 //
-//  for (i=0; i<len_onij+1; i=i+1) begin 
+  for (i=0; i<len_nij+1; i=i+1) begin 
+    #1;
+    if (i>0) begin
+      out_scan_file = $fscanf(out_file,"%128b", answer);
+      if (sfp_out == answer)
+        $display("%2d-th output featuremap Data matched! :D", i);
+      else begin
+        $display("%2d-th output featuremap Data ERROR!!", i); 
+        $display("sfpout: %128b", sfp_out);
+        $display("answer: %128b", answer);
+        error = 1;
+      end
+    end
+
+  end
+
+  if (error == 0) begin
+  	$display("############ No error detected ##############"); 
+  	$display("########### Project Completed !! ############"); 
+  end
 //
 //    #0.5 clk = 1'b0; 
 //    #0.5 clk = 1'b1; 
@@ -374,9 +393,7 @@ initial begin
 //  end
 //
 //
-//  if (error == 0) begin
-//  	$display("############ No error detected ##############"); 
-//  	$display("########### Project Completed !! ############"); 
+
 //
 //  end
 //
