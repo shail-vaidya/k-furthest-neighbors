@@ -25,15 +25,16 @@ module core #(
 //***********************************************
 //        Instruction Mapping
 //***********************************************
-//  inst[49]      = acc_q;
-//  inst[48]      = CEN_pmem_q;
-//  inst[47]      = WEN_pmem_q;
-//  inst[46:33]   = A_pmem_q;
-//  inst[32]      = CEN1_xmem_q;
-//  inst[31:21]    = A1_xmem_q;
-//  inst[20]      = CEN0_xmem_q;
-//  inst[19]      = WEN0_xmem_q;
-//  inst[18:8]    = A0_xmem_q;
+//  inst[39]      = psum_bypass_q;
+//  inst[38]      = acc_q;
+//  inst[37]      = CEN_pmem_q;
+//  inst[36]      = WEN_pmem_q;
+//  inst[35:27]   = A_pmem_q;
+//  inst[26]      = CEN1_xmem_q;
+//  inst[25:18]    = A1_xmem_q;
+//  inst[17]      = CEN0_xmem_q;
+//  inst[16]      = WEN0_xmem_q;
+//  inst[15:8]    = A0_xmem_q;
 //  inst[7]       = ofifo_rd_q;
 //  inst[6]       = ififo_wr_q;
 //  inst[5]       = ififo_rd_q;
@@ -49,7 +50,6 @@ module core #(
 wire [psum_bw*col-1:0] ofifo_rdata;
 wire [bw*row-1:0] Q0_xmem;
 wire [bw*row-1:0] Q1_xmem;
-
 wire [psum_bw*col-1:0] sfu_i_data;
 
 //*************************************************************
@@ -85,7 +85,8 @@ corelet #(
     .ififo_wdata        (Q1_xmem),
     .ififo_ready        (ififo_ready),
     // SFP Ports
-    .sfp_acc_i          (inst[49]),
+    .sfp_acc_i          (inst[38]),
+    .sfp_psum_bypass    (inst[39]),
     .sfp_psum_i         (sfu_i_data),
     .sfp_out            (sfp_out)
 );
@@ -93,28 +94,28 @@ corelet #(
 //*************************************************************
 //                      XMEM Instance
 //*************************************************************
-xmem_2048x32 xmem_inst (
+xmem_256x32 xmem_inst (
     .CLK    (clk),        
-    .WEN0    (inst[19]),
-    .CEN0    (inst[20]),
+    .WEN0    (inst[16]),
+    .CEN0    (inst[17]),
     .D0      (D_xmem),  
-    .A0      (inst[18:8]),  
+    .A0      (inst[15:8]),  
     .Q0      (Q0_xmem),
     .WEN1    (1'b1),    // Tied high so that Port1 can be used only for reading
-    .CEN1    (inst[32]),
+    .CEN1    (inst[26]),
     .D1      (32'b0),  
-    .A1      (inst[31:21]),  
+    .A1      (inst[25:18]),  
     .Q1      (Q1_xmem)
 );
 //*************************************************************
 //                      PMEM Instance
 //*************************************************************
-pmem_16384x128 pmem_inst (
+pmem_512x128 pmem_inst (
     .CLK    (clk),        
-    .WEN    (inst[47]),
-    .CEN    (inst[48]),
+    .WEN    (inst[36]),
+    .CEN    (inst[37]),
     .D      (ofifo_rdata),  
-    .A      (inst[46:33]),  
+    .A      (inst[35:27]),  
     .Q      (sfu_i_data)     
 );
 
