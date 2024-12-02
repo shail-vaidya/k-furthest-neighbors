@@ -6,11 +6,11 @@ module core_tb;
 
 parameter bw = 4;
 parameter psum_bw = 16;
-parameter len_kij = 1;
+parameter len_kij = 9;
 parameter len_onij = 16;
 parameter col = 8;
 parameter row = 8;
-parameter len_nij = 64;
+parameter len_nij = 36;
 reg clk = 1;
 reg reset = 1;
 //FIXME: Why was this updated to 50?
@@ -19,14 +19,14 @@ reg [1:0]  inst_w_q = 0;
 reg [bw*row-1:0] D_xmem_q = 0;
 reg CEN0_xmem = 1;
 reg WEN0_xmem = 1;
-reg [9:0] A0_xmem = 0;
+reg [7:0] A0_xmem = 0;
 reg CEN1_xmem = 1;
-reg [9:0] A1_xmem = 0;
+reg [7:0] A1_xmem = 0;
 reg CEN0_xmem_q = 1;
 reg WEN0_xmem_q = 1;
-reg [9:0] A0_xmem_q = 0;
+reg [7:0] A0_xmem_q = 0;
 reg CEN1_xmem_q = 1;
-reg [9:0] A1_xmem_q = 0;
+reg [7:0] A1_xmem_q = 0;
 reg CEN_pmem = 1;
 reg WEN_pmem = 1;
 reg [8:0] A_pmem = 0;
@@ -55,7 +55,6 @@ reg psum_bypass_q = 0;
 reg [1:0]  inst_w; 
 reg [bw*row-1:0] D_xmem;
 reg [psum_bw*col-1:0] answer;
-
 
 
 reg ififo_wr;
@@ -159,7 +158,7 @@ initial begin
   $dumpfile("core_tb.vcd");
   $dumpvars(0,core_tb);
 
-  x_file = $fopen("activation.txt", "r");
+  x_file = $fopen("WS_activation.txt", "r");
   //x_file = $fopen("WS_activation.txt", "r");
   // Following three lines are to remove the first three comment lines of the file
   x_scan_file = $fscanf(x_file,"%s", captured_data);
@@ -190,11 +189,11 @@ initial begin
   //-----------------------------------------------------------------------------------------------------------------
 
   $display("Writing Weight Data to XMEM");
-  for (kij=0; kij<1; kij=kij+1) begin  // Weight loading to SRAM loop
+  for (kij=0; kij<9; kij=kij+1) begin  // Weight loading to SRAM loop
 
     case(kij)
-      0: w_file_name = "weight.txt";
-      /*0: w_file_name = "WS_weight_kij0.txt";
+      //0: w_file_name = "weight.txt";
+      0: w_file_name = "WS_weight_kij0.txt";
       1: w_file_name = "WS_weight_kij1.txt";
       2: w_file_name = "WS_weight_kij2.txt";
       3: w_file_name = "WS_weight_kij3.txt";
@@ -202,7 +201,7 @@ initial begin
       5: w_file_name = "WS_weight_kij5.txt";
       6: w_file_name = "WS_weight_kij6.txt";
       7: w_file_name = "WS_weight_kij7.txt";
-      8: w_file_name = "WS_weight_kij8.txt";*/
+      8: w_file_name = "WS_weight_kij8.txt";
     endcase
 
     w_file = $fopen(w_file_name, "r");
@@ -298,10 +297,7 @@ initial begin
         //---------------------------------- O-FIFO polling and comparing PSUMs --------------------------------------------------
         m=len_nij*len_kij;
         n = len_nij;
-        pmem_file = $fopen("psum.txt", "r");  
-        pmem_scan_file = $fscanf(pmem_file,"%s", answer); 
-        pmem_scan_file = $fscanf(pmem_file,"%s", answer); 
-        pmem_scan_file = $fscanf(pmem_file,"%s", answer); 
+        pmem_file = $fopen("WS_psum.txt", "r");  
         error = 0;
         while (m > 0) begin
           if(ofifo_valid) begin
