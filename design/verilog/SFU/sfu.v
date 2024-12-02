@@ -18,9 +18,10 @@ module sfu #(
     //reg valid_q;
     reg acc_out_q;
 
-    reg signed [col*psum_bw-1:0] psum_q;
+    reg [col*psum_bw-1:0] psum_q;
 
     wire [col*psum_bw-1:0] temp_psum_w;
+    wire [col*psum_bw-1:0] temp_psum_acc_w;
     wire [col*psum_bw-1:0] temp_relu_psum_w;
     wire [col*psum_bw-1:0] temp_relu_only_psum_w;
     wire [col*psum_bw-1:0] temp_out_psum_w;
@@ -30,15 +31,18 @@ module sfu #(
     genvar k;
     generate
         for (k=0;k<=col-1;k=k+1) begin : sfp_out_assign
-        
+            //Acc only
+            //Doing here for carry issue
+            assign temp_psum_acc_w[((k+1)*psum_bw)-1:k*psum_bw] = psum_in[((k+1)*psum_bw)-1:k*psum_bw] + psum_q[((k+1)*psum_bw)-1:k*psum_bw];         
+
             // ReLU
             assign temp_relu_psum_w[((k+1)*psum_bw)-1:k*psum_bw] = psum_q[((k+1)*psum_bw)-1] ? 0 : psum_q[((k+1)*psum_bw)-1:k*psum_bw];         
             assign temp_relu_only_psum_w[((k+1)*psum_bw)-1:k*psum_bw] =  psum_in[((k+1)*psum_bw)-1] ? 0 : psum_in[((k+1)*psum_bw)-1:k*psum_bw];
             
-            assign temp_out_psum_w[(k+1)*psum_bw-1:k*psum_bw] = acc_out_q ? temp_relu_psum_w[((k+1)*psum_bw)-1:k*psum_bw] : temp_relu_only_psum_w[((k+1)*psum_bw)-1:k*psum_bw];
+            assign temp_out_psum_w[((k+1)*psum_bw)-1:k*psum_bw] = acc_out_q ? temp_relu_psum_w[((k+1)*psum_bw)-1:k*psum_bw] : temp_relu_only_psum_w[((k+1)*psum_bw)-1:k*psum_bw];
 
             // Psum bypass
-            assign psum_out[(k+1)*psum_bw-1:k*psum_bw] = psum_bypass_i ? psum_in[((k+1)*psum_bw)-1:k*psum_bw] : temp_out_psum_w[(k+1)*psum_bw-1:k*psum_bw];
+            assign psum_out[((k+1)*psum_bw)-1:k*psum_bw] = psum_bypass_i ? psum_in[((k+1)*psum_bw)-1:k*psum_bw] : temp_out_psum_w[(k+1)*psum_bw-1:k*psum_bw];
 
         end
     endgenerate
@@ -59,7 +63,7 @@ module sfu #(
             end
             else if(acc_q && acc_i) begin
                 // Accumulate
-                psum_q <= psum_q + psum_in; 
+                psum_q <= temp_psum_acc_w; 
                 acc_out_q <= 1'b0;
             end
             else if(acc_q && ~acc_i) begin
