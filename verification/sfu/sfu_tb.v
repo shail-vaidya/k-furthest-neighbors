@@ -11,9 +11,12 @@ reg  [psum_bw*col-1:0] psum;
 reg  [psum_bw*col-1:0] psum_in;
 reg acc;
 reg acc_i;
+reg pbp_i;
+reg psum_bypass_i;
 wire [psum_bw*col-1:0] sfu_out;
-integer psum_file, acc_file;
-integer psum_result, acc_result;
+integer psum_file, acc_file, pbp_file;
+integer psum_result, acc_result, pbp_result;
+
 
 sfu #(
     .bw     (bw),
@@ -24,6 +27,7 @@ sfu #(
     .clk        (clk),
     .reset      (reset),
     .acc_i      (acc_i),
+    .psum_bypass_i (psum_bypass_i),
     .psum_in    (psum_in),
     .psum_out   (sfu_out)
 );
@@ -53,19 +57,29 @@ initial begin
         $finish;
     end
 
-    while (!$feof(psum_file) && !$feof(acc_file)) begin
+    pbp_file = $fopen("psum_bypass.txt", "r");
+    if (pbp_file == 0) begin
+        $display("Error opening pbp_file.txt");
+        $finish;
+    end
+
+    while (!$feof(psum_file) && !$feof(acc_file) &&  !$feof(pbp_file)) begin
             // Read the next value from each file
             psum_result = $fscanf(psum_file, "%h,", psum); 
             acc_result = $fscanf(acc_file, "%b,", acc);
+            pbp_result = $fscanf(pbp_file, "%b,", pbp_i);
 
-            if (psum_result == 1 && acc_result == 1) begin
-                psum_in = psum;  // Apply the stimulus to stim_in1
-                acc_i = acc;  // Apply the stimulus to stim_in2
+            if (psum_result == 1 && acc_result == 1 && pbp_result == 1) begin
+                psum_in = psum;  
+                acc_i = acc;  
+                psum_bypass_i = pbp_i;
                 #10;  // Wait for 10 time units
             end
         end
     $fclose(psum_file);
     $fclose(acc_file);
+    $fclose(pbp_file);
+
     #20
     $finish;
 end
