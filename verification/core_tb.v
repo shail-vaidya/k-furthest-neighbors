@@ -70,6 +70,7 @@ wire [col*psum_bw-1:0] sfp_out;
 wire l0_ready;
 wire ififo_ready;
 wire ofifo_rd;
+wire psum_bypass_q;
 
 integer x_file, x_scan_file ; // file_handler
 integer w_file, w_scan_file ; // file_handler

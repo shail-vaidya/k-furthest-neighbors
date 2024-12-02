@@ -71,6 +71,7 @@ wire [col*psum_bw-1:0] sfp_out;
 wire l0_ready;
 wire ififo_ready;
 wire ofifo_rd;
+wire psum_bypass_q;
 
 integer x_file, x_scan_file ; // file_handler
 integer w_file, w_scan_file ; // file_handler
@@ -115,8 +116,7 @@ assign inst_q[4]  	  = l0_rd_q;
 assign inst_q[3]  	  = l0_wr_q;
 assign inst_q[2]  	  = mode_q; 
 assign inst_q[1]  	  = execute_q; 
-assign inst_q[0]  	  = load_q;
-assign ofifo_rd       = !CEN_pmem && !WEN_pmem; 
+assign inst_q[0]  	  = load_q; 
 //FIXME: setting ofifo_rd to be a wire
 assign ofifo_rd		= !CEN_pmem && !WEN_pmem;
 
