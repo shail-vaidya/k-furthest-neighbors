@@ -10,8 +10,7 @@ parameter len_kij = 9;
 parameter len_onij = 16;
 parameter col = 8;
 parameter row = 8;
-parameter len_nij = 1024;
-
+parameter len_nij = 36;
 reg clk = 1;
 reg reset = 1;
 //FIXME: Why was this updated to 50?
@@ -77,7 +76,7 @@ integer w_file, w_scan_file ; // file_handler
 integer acc_file, acc_scan_file ; // file_handler
 integer out_file, out_scan_file ; // file_handler
 integer captured_data; 
-integer t, i, j, k, kij, m;
+integer t, i, j, k, kij, m, n;
 integer error;
 
 //  inst[49]      = acc_q;
@@ -152,7 +151,7 @@ initial begin
   $dumpvars(0,core_tb);
 
   //x_file = $fopen("activation_tile0.txt", "r");
-  x_file = $fopen("activation.txt", "r");
+  x_file = $fopen("WS_activation.txt", "r");
   // Following three lines are to remove the first three comment lines of the file
   x_scan_file = $fscanf(x_file,"%s", captured_data);
   x_scan_file = $fscanf(x_file,"%s", captured_data);
@@ -161,39 +160,40 @@ initial begin
   //-------------- Reset --------------
   #0.5 
   reset = 1;
+  $display("Asserted Reset");
   #10
   reset = 0;
-  #2 
+  $display("Deasserted Reset");
+  #2
   //-----------------------------------
 
   //----------------------------------- Activation data writing to memory ------------------------------------------
+  $display("Writing Activation Data to XMEM");
   for (t=0; t<len_nij; t=t+1) begin  
     #1 x_scan_file = $fscanf(x_file,"%32b", D_xmem); WEN0_xmem = 0; CEN0_xmem = 0; if (t>0) A0_xmem = A0_xmem + 1;   
   end
 
-  #1 WEN0_xmem = 1;  CEN0_xmem = 1; A0_xmem = 0;
+  #1 WEN0_xmem = 1;  CEN0_xmem = 1;
+  $display("Finished Writing Activation Data to XMEM");
   #5 
 
   $fclose(x_file);
   //-----------------------------------------------------------------------------------------------------------------
 
-
-  for (kij=0; kij<2; kij=kij+1) begin  // Weight loading to SRAM loop
+  $display("Writing Weight Data to XMEM");
+  for (kij=0; kij<9; kij=kij+1) begin  // Weight loading to SRAM loop
 
     case(kij)
-     0: w_file_name = "weight.txt"; //all ic and oc; 32 bits = 4*(rows)
-     1: w_file_name = "weight.txt"; //all ic and oc; 32 bits = 4*(rows)
-  //   0: w_file_name = "weight_itile0_otile0_kij0.txt"; //all ic and oc; 32 bits = 4*(rows)
-  //   1: w_file_name = "weight_itile0_otile0_kij1.txt";
-  //   2: w_file_name = "weight_itile0_otile0_kij2.txt";
-  //   3: w_file_name = "weight_itile0_otile0_kij3.txt";
-  //   4: w_file_name = "weight_itile0_otile0_kij4.txt";
-  //   5: w_file_name = "weight_itile0_otile0_kij5.txt";
-  //   6: w_file_name = "weight_itile0_otile0_kij6.txt";
-  //   7: w_file_name = "weight_itile0_otile0_kij7.txt";
-  //   8: w_file_name = "weight_itile0_otile0_kij8.txt";
+      0: w_file_name = "WS_weight_kij0.txt";
+      1: w_file_name = "WS_weight_kij1.txt";
+      2: w_file_name = "WS_weight_kij2.txt";
+      3: w_file_name = "WS_weight_kij3.txt";
+      4: w_file_name = "WS_weight_kij4.txt";
+      5: w_file_name = "WS_weight_kij5.txt";
+      6: w_file_name = "WS_weight_kij6.txt";
+      7: w_file_name = "WS_weight_kij7.txt";
+      8: w_file_name = "WS_weight_kij8.txt";
     endcase
-    
 
     w_file = $fopen(w_file_name, "r");
     // Following three lines are to remove the first three comment lines of the file
@@ -215,12 +215,13 @@ initial begin
   end // end of Weight loading to SRAM loop
 
   #1 WEN0_xmem = 1;  CEN0_xmem = 1;
+  $display("Finished Writing Weight Data to XMEM");
   #1
 
-
+  $display("Starting Load and Execute");
   fork
     begin
-      for (kij=0; kij<2; kij=kij+1) begin 
+      for (kij=0; kij<len_kij; kij=kij+1) begin 
         t = col;
         while (t > 0) begin
           if(l0_ready) begin
@@ -270,6 +271,12 @@ initial begin
         mode = 1;
         CEN0_xmem = 1;
         WEN0_xmem = 1;
+        $display("Finished Load and Execute for kij-%2d",kij);
+        #1
+        load = 0;
+        execute = 0;
+        mode = 0;
+        #19;
       end
       #1;
       load = 0;
@@ -277,24 +284,35 @@ initial begin
       mode = 0; 
       end
     begin
-        m=len_nij*2;
-        //m=len_nij*len_kij; //1024*9
+        //m=len_nij*2;
+        m=len_nij*len_kij; //36*9
+        n = len_nij;
         while (m > 0) begin
           if(ofifo_valid) begin
-            #1;
-            CEN_pmem = 0;
-            WEN_pmem = 0;
-            if (m < len_nij * len_kij) begin
-              A_pmem = A_pmem + 1;
+            if(n>0) begin
+              CEN_pmem = 0;
+              WEN_pmem = 0;
+              if (m < len_nij * len_kij) begin
+                A_pmem = A_pmem + 1;
+              end
+              m=m-1;
+              n=n-1;
             end
-            m=m-1;
+            if(m%len_nij == 0) begin
+              $display("Populated all psums for kij-%2d in PMEM",((len_nij*len_kij-m)/len_nij)-1);
+            end
+            #1;
           end
           else begin
-            #1;
             CEN_pmem = 1;
-            WEN_pmem = 1; 
+            WEN_pmem = 1;
+            n = len_nij;
+            #1; 
           end
-        end 
+        end
+        #1;
+        CEN_pmem = 1;
+        WEN_pmem = 1; 
     end
   join
   
