@@ -14,7 +14,7 @@ parameter len_nij = 2;
 reg clk = 1;
 reg reset = 1;
 //FIXME: Why was this updated to 50?
-wire [49:0] inst_q; 
+wire [39:0] inst_q; 
 reg [1:0]  inst_w_q = 0; 
 reg [bw*row-1:0] D_xmem_q = 0;
 reg CEN0_xmem = 1;
@@ -70,6 +70,7 @@ wire [col*psum_bw-1:0] sfp_out;
 wire l0_ready;
 wire ififo_ready;
 wire ofifo_rd;
+wire psum_bypass_q;
 
 integer x_file, x_scan_file ; // file_handler
 integer w_file, w_scan_file ; // file_handler
@@ -80,15 +81,17 @@ integer captured_data;
 integer t, i, j, k, kij, m, n;
 integer error;
 
-//  inst[49]      = acc_q;
-//  inst[48]      = CEN_pmem_q;
-//  inst[47]      = WEN_pmem_q;
-//  inst[46:33]   = A_pmem_q;
-//  inst[32]      = CEN1_xmem_q;
-//  inst[31:21]    = A1_xmem_q;
-//  inst[20]      = CEN0_xmem_q;
-//  inst[19]      = WEN0_xmem_q;
-//  inst[18:8]    = A0_xmem_q;
+
+//  inst[39]      = psum_bypass_q;
+//  inst[38]      = acc_q;
+//  inst[37]      = CEN_pmem_q;
+//  inst[36]      = WEN_pmem_q;
+//  inst[35:27]   = A_pmem_q;
+//  inst[26]      = CEN1_xmem_q;
+//  inst[25:18]    = A1_xmem_q;
+//  inst[17]      = CEN0_xmem_q;
+//  inst[16]      = WEN0_xmem_q;
+//  inst[15:8]    = A0_xmem_q;
 //  inst[7]       = ofifo_rd_q;
 //  inst[6]       = ififo_wr_q;
 //  inst[5]       = ififo_rd_q;
@@ -96,17 +99,19 @@ integer error;
 //  inst[3]       = l0_wr_q;
 //  inst[2]       = mode_q
 //  inst[1]       = execute_q; 
-//  inst[0]       = load_q;
+//  inst[0]       = load_q; 
 
-assign inst_q[49] 	  = acc_q;
-assign inst_q[48] 	  = CEN_pmem_q;
-assign inst_q[47] 	  = WEN_pmem_q;
-assign inst_q[46:33] 	= A_pmem_q;
-assign inst_q[32] 	  = CEN1_xmem_q;
-assign inst_q[31:21] 	= A1_xmem_q;
-assign inst_q[20]   	= CEN0_xmem_q;
-assign inst_q[19]   	= WEN0_xmem_q;
-assign inst_q[18:8] 	= A0_xmem_q;
+
+assign inst_q[39] 	  = psum_bypass_q;
+assign inst_q[38] 	  = acc_q;
+assign inst_q[37] 	  = CEN_pmem_q;
+assign inst_q[36] 	  = WEN_pmem_q;
+assign inst_q[35:27] 	= A_pmem_q;
+assign inst_q[26] 	  = CEN1_xmem_q;
+assign inst_q[25:18] 	= A1_xmem_q;
+assign inst_q[17]   	= CEN0_xmem_q;
+assign inst_q[16] 	  = WEN0_xmem_q;
+assign inst_q[15:8]  	= A0_xmem_q;
 assign inst_q[7]  	  = ofifo_rd_q;
 assign inst_q[6]  	  = ififo_wr_q;
 assign inst_q[5]  	  = ififo_rd_q;
@@ -207,7 +212,7 @@ initial begin
     for (t=0; t<col; t=t+1) begin  //iterating over all cols (oc)
       #1 w_scan_file = $fscanf(w_file,"%32b", D_xmem); WEN0_xmem = 0; CEN0_xmem = 0; 
       if (t==0) begin 
-        A0_xmem = 11'b10000000000 + kij*11'h8;
+        A0_xmem = 8'b10000000 + kij*8'h8;
       end
       else if (t>0) A0_xmem = A0_xmem + 1;  
     end
@@ -231,7 +236,7 @@ initial begin
             CEN0_xmem = 0;
             WEN0_xmem = 1;
             if (t == col)
-              A0_xmem = 11'h400 + kij*11'h8;
+              A0_xmem = 8'h80 + kij*8'h8;
             else if (t < col) begin
               A0_xmem = A0_xmem + 1;
             end
@@ -253,7 +258,7 @@ initial begin
             CEN0_xmem = 0;
             WEN0_xmem = 1;
             if (t == len_nij)
-              A0_xmem = 11'h0;
+              A0_xmem = 8'h0;
             else if (t < len_nij) begin
               A0_xmem = A0_xmem + 1;
             end

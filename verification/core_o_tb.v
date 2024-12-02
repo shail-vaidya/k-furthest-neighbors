@@ -15,7 +15,7 @@ parameter len_nij = 4;
 
 reg clk = 1;
 reg reset = 1;
-wire [49:0] inst_q; 
+wire [39:0] inst_q; 
 reg [1:0]  inst_w_q = 0; 
 reg [bw*row-1:0] D_xmem_q = 0;
 reg CEN0_xmem = 1;
@@ -71,6 +71,7 @@ wire [col*psum_bw-1:0] sfp_out;
 wire l0_ready;
 wire ififo_ready;
 wire ofifo_rd;
+wire psum_bypass_q;
 
 integer x_file, x_scan_file ; // file_handler
 integer w_file, w_scan_file ; // file_handler
@@ -98,23 +99,24 @@ integer error;
 //  inst[1]       = execute_q; 
 //  inst[0]       = load_q;
 
-assign inst_q[49] 	= acc_q;
-assign inst_q[48] 	= CEN_pmem_q;
-assign inst_q[47] 	= WEN_pmem_q;
-assign inst_q[46:33] 	= A_pmem_q;
-assign inst_q[32] 	= CEN1_xmem_q;
-assign inst_q[31:21] 	= A1_xmem_q;
-assign inst_q[20]   	= CEN0_xmem_q;
-assign inst_q[19]   	= WEN0_xmem_q;
-assign inst_q[18:8] 	= A0_xmem_q;
-assign inst_q[7]  	= ofifo_rd_q;
-assign inst_q[6]  	= ififo_wr_q;
-assign inst_q[5]  	= ififo_rd_q;
-assign inst_q[4]  	= l0_rd_q;
-assign inst_q[3]  	= l0_wr_q;
-assign inst_q[2]  	= mode_q; 
-assign inst_q[1]  	= execute_q; 
-assign inst_q[0]  	= load_q; 
+assign inst_q[39] 	  = psum_bypass_q;
+assign inst_q[38] 	  = acc_q;
+assign inst_q[37] 	  = CEN_pmem_q;
+assign inst_q[36] 	  = WEN_pmem_q;
+assign inst_q[35:27] 	= A_pmem_q;
+assign inst_q[26] 	  = CEN1_xmem_q;
+assign inst_q[25:18] 	= A1_xmem_q;
+assign inst_q[17]   	= CEN0_xmem_q;
+assign inst_q[16] 	  = WEN0_xmem_q;
+assign inst_q[15:8]  	= A0_xmem_q;
+assign inst_q[7]  	  = ofifo_rd_q;
+assign inst_q[6]  	  = ififo_wr_q;
+assign inst_q[5]  	  = ififo_rd_q;
+assign inst_q[4]  	  = l0_rd_q;
+assign inst_q[3]  	  = l0_wr_q;
+assign inst_q[2]  	  = mode_q; 
+assign inst_q[1]  	  = execute_q; 
+assign inst_q[0]  	  = load_q; 
 //FIXME: setting ofifo_rd to be a wire
 assign ofifo_rd		= !CEN_pmem && !WEN_pmem;
 
@@ -228,7 +230,7 @@ initial begin
   w_scan_file = $fscanf(w_file,"%s", captured_data);
 
   //---------------------------------- Kernel data writing to memory --------------------------------------------------
-  A0_xmem = 11'b10000000000;
+  A0_xmem = 8'b10000000;
   for (t=0; t<len_nij; t=t+1) begin
     #1 w_scan_file = $fscanf(w_file,"%32b", D_xmem); WEN0_xmem = 0; CEN0_xmem = 0; if (t>0) A0_xmem = A0_xmem + 1;  //WEN1_xmem is always 1
   end
@@ -244,8 +246,8 @@ initial begin
 
     // -------------------------- Load and Execute ---------------------------------------------------
   t = len_nij;
-  A0_xmem = 11'h0;
-  A1_xmem = 11'h400;
+  A0_xmem = 8'h0;
+  A1_xmem = 8'h80;
 
   while (t > 0) begin
     if(l0_ready & ififo_ready) begin

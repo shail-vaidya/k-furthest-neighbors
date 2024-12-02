@@ -15,7 +15,7 @@ module core #(
     input                       clk,
     input                       reset,
     input   [bw*row-1:0]        D_xmem,
-    input   [49:0]              inst,
+    input   [39:0]              inst,
     output                      ofifo_valid,
     output                      l0_ready,
     output                      ififo_ready,
