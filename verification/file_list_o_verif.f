@@ -11,7 +11,7 @@
 ../design/verilog/PE_array/mac_array.v
 ../design/verilog/SFU/sfu.v
 ../design/verilog/corelet.v
-../design/verilog/memories/xmem_2048x32.v
-../design/verilog/memories/pmem_16384x128.v
+../design/verilog/memories/xmem_256x32.v
+../design/verilog/memories/pmem_512x128.v
 ../design/verilog/core.v
 ./core_o_tb.v
