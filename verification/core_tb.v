@@ -10,7 +10,7 @@ parameter len_kij = 9;
 parameter len_onij = 16;
 parameter col = 8;
 parameter row = 8;
-parameter len_nij = 2;
+parameter len_nij = 36;
 reg clk = 1;
 reg reset = 1;
 //FIXME: Why was this updated to 50?
@@ -19,20 +19,20 @@ reg [1:0]  inst_w_q = 0;
 reg [bw*row-1:0] D_xmem_q = 0;
 reg CEN0_xmem = 1;
 reg WEN0_xmem = 1;
-reg [10:0] A0_xmem = 0;
+reg [9:0] A0_xmem = 0;
 reg CEN1_xmem = 1;
-reg [10:0] A1_xmem = 0;
+reg [9:0] A1_xmem = 0;
 reg CEN0_xmem_q = 1;
 reg WEN0_xmem_q = 1;
-reg [10:0] A0_xmem_q = 0;
+reg [9:0] A0_xmem_q = 0;
 reg CEN1_xmem_q = 1;
-reg [10:0] A1_xmem_q = 0;
+reg [9:0] A1_xmem_q = 0;
 reg CEN_pmem = 1;
 reg WEN_pmem = 1;
-reg [10:0] A_pmem = 0;
+reg [8:0] A_pmem = 0;
 reg CEN_pmem_q = 1;
 reg WEN_pmem_q = 1;
-reg [10:0] A_pmem_q = 0;
+reg [8:0] A_pmem_q = 0;
 reg ofifo_rd_q = 0;
 reg ififo_wr_q = 0;
 reg ififo_rd_q = 0;
@@ -49,6 +49,8 @@ reg mode_s1_q = 0;
 reg mode_s2_q = 0;
 reg acc_q = 0;
 reg acc = 0;
+reg psum_bypass = 0;
+reg psum_bypass_q = 0;
 
 reg [1:0]  inst_w; 
 reg [bw*row-1:0] D_xmem;
@@ -70,7 +72,7 @@ wire [col*psum_bw-1:0] sfp_out;
 wire l0_ready;
 wire ififo_ready;
 wire ofifo_rd;
-wire psum_bypass_q;
+
 
 integer x_file, x_scan_file ; // file_handler
 integer w_file, w_scan_file ; // file_handler
@@ -223,7 +225,7 @@ initial begin
   #1 WEN0_xmem = 1;  CEN0_xmem = 1;
   $display("Finished Writing Weight Data to XMEM");
   #1
-
+  psum_bypass = 1;
   $display("Starting Load and Execute");
   fork
     begin
@@ -306,11 +308,11 @@ initial begin
               WEN_pmem = 0;
               pmem_scan_file = $fscanf(pmem_file,"%128b", answer);
               if (answer == sfp_out)
-                $display("psum for nij = %2d matched! :D", n);
+                $display("psum for nij = %2d matched! :D", len_nij - n);
               else begin
-                $display("psum for nij = %2d data ERROR!!", n); 
-                $display("sfpout: %128b", sfp_out);
-                $display("answer: %128b", answer);
+                $display("psum for nij = %2d data ERROR!!", len_nij - n); 
+                //$display("sfpout: %128b", sfp_out);
+                //$display("answer: %128b", answer);
                 $display("error cycle: %2d", (len_kij*len_nij - m));
                 error = error + 1;
               end
@@ -339,6 +341,8 @@ initial begin
         $display("Total number of errors : %2d", error);
     end
   join
+  #1;
+  psum_bypass = 0;
   
         
     //////// OFIFO READ ////////
@@ -440,6 +444,7 @@ always @ (posedge clk) begin
    ififo_rd_q <= ififo_rd;
    l0_rd_q    <= l0_rd;
    l0_wr_q    <= l0_wr ;
+   psum_bypass_q <= psum_bypass;
 
    mode_s1_q  <= mode;
    mode_s2_q  <= mode_s1_q;

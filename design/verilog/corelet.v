@@ -146,7 +146,7 @@ sfu #(
     .reset          (reset),
     .acc_i          (sfp_acc_i),
     .psum_bypass_i  (sfp_psum_bypass),
-    .psum_in        (sfp_psum_i),
+    .psum_in        (sfp_psum_muxed),
     .psum_out       (sfp_out)
 );
 
