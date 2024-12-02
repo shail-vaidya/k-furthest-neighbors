@@ -243,57 +243,53 @@ initial begin
 
 
     // -------------------------- Load and Execute ---------------------------------------------------
-    t = len_nij;
-    A0_xmem = 11'h0;
-    A1_xmem = 11'h400;
+  t = len_nij;
+  A0_xmem = 11'h0;
+  A1_xmem = 11'h400;
 
-    while (t > 0) begin
-      if(l0_ready & ififo_ready) begin
-        #1;
-        CEN0_xmem = 0;
-        WEN0_xmem = 1;
-	CEN1_xmem = 0;
+  while (t > 0) begin
+    if(l0_ready & ififo_ready) begin
+      #1;
+      CEN0_xmem = 0;
+      WEN0_xmem = 1;
+      CEN1_xmem = 0;
 	//WEN1_xmem is always 1
-
-
 	//Enter Instruction for o_exec
-	mode = 1;
-	execute = 1;
-	load = 0;
-
-	if (t < len_nij) begin
-	  A0_xmem = A0_xmem + 1;
-	  A1_xmem = A1_xmem + 1;
-	end
-	t = t - 1;
+      mode = 1;
+      execute = 1;
+      load = 0;
+      if (t < len_nij) begin
+        A0_xmem = A0_xmem + 1;
+        A1_xmem = A1_xmem + 1;
       end
-      else begin
-        #1
-        CEN0_xmem = 1;
-        WEN0_xmem = 1;
-      end
+      t = t - 1;
     end
+    else begin
+    #1
+      CEN0_xmem = 1;
+      WEN0_xmem = 1;
+    end
+  end
 
 
-    t = 16;
-    while (t > 0) begin
-	#1;
+  t = 16;
+  while (t > 0) begin
+  #1;
 	//Enter shifting sequence
 	mode = 1;
 	execute = 0;
 	load = 1;
-	
 	CEN0_xmem = 1;
 	WEN0_xmem = 1;
 	CEN1_xmem = 1;
 	//WEN1_xmem is always 1
 	t = t - 1;
-    end
-    #1
-    mode = 1;
-    execute = 0;
-    load = 0;
-    #1
+  end
+  #1
+  mode = 1;
+  execute = 0;
+  load = 0;
+  #1
 
 //End of load and execute sequence for output stationary
 
