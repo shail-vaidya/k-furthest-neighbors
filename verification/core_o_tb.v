@@ -230,7 +230,7 @@ initial begin
   w_scan_file = $fscanf(w_file,"%s", captured_data);
 
   //---------------------------------- Kernel data writing to memory --------------------------------------------------
-  A0_xmem = 11'b10000000000;
+  A0_xmem = 8'b10000000;
   for (t=0; t<len_nij; t=t+1) begin
     #1 w_scan_file = $fscanf(w_file,"%32b", D_xmem); WEN0_xmem = 0; CEN0_xmem = 0; if (t>0) A0_xmem = A0_xmem + 1;  //WEN1_xmem is always 1
   end
@@ -246,8 +246,8 @@ initial begin
 
     // -------------------------- Load and Execute ---------------------------------------------------
   t = len_nij;
-  A0_xmem = 11'h0;
-  A1_xmem = 11'h400;
+  A0_xmem = 8'h0;
+  A1_xmem = 8'h80;
 
   while (t > 0) begin
     if(l0_ready & ififo_ready) begin
