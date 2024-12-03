@@ -82,7 +82,7 @@ integer pmem_file, pmem_scan_file; //file_handler
 integer acc_file, acc_scan_file ; // file_handler
 integer out_file, out_scan_file ; // file_handler
 integer captured_data, output_data;
-integer t, i, j, k, kij, m, n, m2, n2, ic_nij, oc_nij, ic;
+integer t, i, j, k, kij, m, n, m2, n2, ic_nij, oc_nij, oc_nij2, ic;
 integer error;
 
 
@@ -309,6 +309,10 @@ initial begin
               $display("Populated all psums for kij-%2d in PMEM",((len_nij*len_kij-m)/len_nij)-1);
             end
           end
+          else begin
+            CEN_pmem = 1;
+            WEN_pmem = 1;
+          end
           #1;
         end
         else begin
@@ -318,10 +322,10 @@ initial begin
           #1; 
         end
         end
-        #1;
         CEN_pmem = 1;
         WEN_pmem = 1; 
         $display("Total number of errors : %2d", error);
+        #1;
     end
     //---------------------------------- Comparing PSUMs --------------------------------------------------
     begin
@@ -369,29 +373,42 @@ error = 0;
 o_scan_file = $fscanf(o_file,"%s", output_data);
 o_scan_file = $fscanf(o_file,"%s", output_data);
 o_scan_file = $fscanf(o_file,"%s", output_data);
-for (oc_nij = 0; oc_nij < 16; oc_nij = oc_nij + 1)
+fork
   begin
-    ic_nij = ((oc_nij/4)*6) + (oc_nij % 4);
-    for (k = 0; k < 9; k = k+ 1) begin
-        ic = ic_nij + ((6*(k/3)) + (k % 3));
-        acc = 1;
-        CEN_pmem = 0;
-        A_pmem = (k * 36) + (ic);
-        #1;
+    for (oc_nij = 0; oc_nij < 16; oc_nij = oc_nij + 1) begin
+      ic_nij = ((oc_nij/4)*6) + (oc_nij % 4);
+      for (k = 0; k < 9; k = k+ 1) begin
+          ic = ic_nij + ((6*(k/3)) + (k % 3));
+          acc = 1;
+          CEN_pmem = 0;
+          A_pmem = (k * 36) + (ic);
+          #1;
+      end
+      CEN_pmem = 1;
+      acc = 0;
+      #1;
     end
-    CEN_pmem = 1;
-    acc = 0;
-    #0.5;
-    o_scan_file = $fscanf(o_file,"%128b", answer);
-    if (answer == sfp_out) begin
-      $display("Output for oc_nij = %2d matched! :D",oc_nij);
-    end
-    else begin
-      $display("psum for oc_nij = %2d data ERROR!!",oc_nij); 
-      error = error + 1;
-    end
-    #0.5;
   end
+  begin
+    #2;
+    oc_nij2=0;
+    while (oc_nij2 < 16) begin
+      #1;
+      if(~acc_q) begin
+        o_scan_file = $fscanf(o_file,"%128b", answer);
+        if (answer == sfp_out) begin
+          $display("Output for oc_nij = %2d matched! :D",oc_nij2);
+        end
+        else begin
+          $display("Output for oc_nij = %2d data ERROR!!",oc_nij2); 
+          error = error + 1;
+        end
+        oc_nij2 = oc_nij2+1;
+      end
+    end
+    $display("Total number of errors : %2d", error);
+  end
+join
 
 #100 $finish;
 end
@@ -408,7 +425,7 @@ always @ (posedge clk) begin
    CEN_pmem_q <= CEN_pmem;
    WEN_pmem_q <= WEN_pmem;
    ofifo_rd_q <= ofifo_rd;
-   acc_s1_q      <= acc;
+   acc_s1_q   <= acc;
    acc_q      <= acc_s1_q;
    ififo_wr_q <= ififo_wr;
    ififo_rd_q <= ififo_rd;
