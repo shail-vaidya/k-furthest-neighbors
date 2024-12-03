@@ -1,0 +1,2 @@
+/verilog/<all_design_files_here>
+/sim/filelist and any other files that the testbench uses

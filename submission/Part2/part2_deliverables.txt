@@ -1,0 +1,2 @@
+/verilog/<add_design_files_here>
+/sim/filelist

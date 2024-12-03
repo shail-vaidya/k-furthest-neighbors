@@ -1,0 +1,2 @@
+/verilog/<all_design_files_here>
+/sim/filelist and all other files that the TB uses
