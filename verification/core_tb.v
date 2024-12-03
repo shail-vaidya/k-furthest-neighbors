@@ -80,7 +80,7 @@ integer pmem_file, pmem_scan_file; //file_handler
 integer acc_file, acc_scan_file ; // file_handler
 integer out_file, out_scan_file ; // file_handler
 integer captured_data, output_data;
-integer t, i, j, k, kij, m, n, m2, n2, ic_nij, oc_nij, oc_nij2, ic;
+integer t, i, j, k, kij, m, n, m2, n2, ic_nij, oc_nij, oc_nij2, ic, count;
 integer error;
 
 
@@ -310,6 +310,7 @@ initial begin
     begin
       m2=len_nij*len_kij;
       n2 = len_nij;
+      count = 0;
       pmem_file = $fopen("WS_psum.txt", "r");  
       error = 0;
       while (m2 > 0) begin
@@ -318,22 +319,26 @@ initial begin
           if(n2>0) begin
             pmem_scan_file = $fscanf(pmem_file,"%128b", answer);
             if (answer == sfp_out) begin
-              $display("psum for kij = %2d nij = %2d matched! :D",((len_nij*len_kij-m2)/len_nij), len_nij - n2);
+              count = count + 1;
             end
             else begin
               $display("psum for kij = %2d nij = %2d data ERROR!!",((len_nij*len_kij-m2)/len_nij), len_nij - n2); 
-              //$display("sfpout: %128b", sfp_out);
-              //$display("answer: %128b", answer);
-              //$display("error cycle: %2d", (len_kij*len_nij - m));
+              $display("sfpout: %128b", sfp_out);
+              $display("answer: %128b", answer);
               error = error + 1;
             end
             m2=m2-1;
             n2=n2-1;
           end
+          if (count == 36) begin
+            $display("psum for kij = %2d all nijs matched! :D",((len_nij*len_kij-m2)/len_nij) - 1);
+            count = 0; 
+          end
         end
         else begin
           #1;
-          n2 = len_nij; 
+          n2 = len_nij;
+          
         end
       end
       #1;
@@ -388,6 +393,12 @@ fork
     $display("Total number of errors : %2d", error);
   end
 join
+
+#1;
+if (error == 0) begin
+  $display("############ No error detected ##############"); 
+  $display("########### Project Completed !! ############"); 
+end
 
 #100 $finish;
 end
