@@ -1,4 +1,4 @@
-// Created by prof. Mingu Kang @VVIP Lab in UCSD ECE department
+// Created by k-furthest-neighbors
 // Please do not spread this code without permission 
 `timescale 1ns/1ps
 
@@ -11,10 +11,9 @@ parameter len_onij = 16;
 parameter col = 8;
 parameter row = 8;
 parameter len_nij = 36;
+
 reg clk = 1;
 reg reset = 1;
-//FIXME: Why was this updated to 50?
-wire [39:0] inst_q; 
 reg [1:0]  inst_w_q = 0; 
 reg [bw*row-1:0] D_xmem_q = 0;
 reg CEN0_xmem = 1;
@@ -52,12 +51,9 @@ reg acc_s1_q = 0;
 reg acc = 0;
 reg psum_bypass = 0;
 reg psum_bypass_q = 0;
-
 reg [1:0]  inst_w; 
 reg [bw*row-1:0] D_xmem;
 reg [psum_bw*col-1:0] answer;
-
-
 reg ififo_wr;
 reg ififo_rd;
 reg l0_rd;
@@ -67,8 +63,10 @@ reg execute;
 reg load;
 reg [8*30:1] stringvar;
 reg [8*30:1] w_file_name;
-wire ofifo_valid;
 reg ofifo_valid_q;
+
+wire ofifo_valid;
+wire [39:0] inst_q; 
 wire [col*psum_bw-1:0] sfp_out;
 wire l0_ready;
 wire ififo_ready;
@@ -86,26 +84,7 @@ integer t, i, j, k, kij, m, n, m2, n2, ic_nij, oc_nij, oc_nij2, ic;
 integer error;
 
 
-//  inst[39]      = psum_bypass_q;
-//  inst[38]      = acc_q;
-//  inst[37]      = CEN_pmem_q;
-//  inst[36]      = WEN_pmem_q;
-//  inst[35:27]   = A_pmem_q;
-//  inst[26]      = CEN1_xmem_q;
-//  inst[25:18]    = A1_xmem_q;
-//  inst[17]      = CEN0_xmem_q;
-//  inst[16]      = WEN0_xmem_q;
-//  inst[15:8]    = A0_xmem_q;
-//  inst[7]       = ofifo_rd_q;
-//  inst[6]       = ififo_wr_q;
-//  inst[5]       = ififo_rd_q;
-//  inst[4]       = l0_rd_q;
-//  inst[3]       = l0_wr_q;
-//  inst[2]       = mode_q
-//  inst[1]       = execute_q; 
-//  inst[0]       = load_q; 
-
-
+//-----------------------------------Instruction Mapping------------------------------------------
 assign inst_q[39] 	  = psum_bypass_q;
 assign inst_q[38] 	  = acc_q;
 assign inst_q[37] 	  = CEN_pmem_q;
@@ -124,6 +103,7 @@ assign inst_q[3]  	  = l0_wr_q;
 assign inst_q[2]  	  = mode_q; 
 assign inst_q[1]  	  = execute_q; 
 assign inst_q[0]  	  = load_q;
+
 assign ofifo_rd       = !CEN_pmem && !WEN_pmem;
 
 
@@ -131,10 +111,10 @@ core  #(.bw(bw), .col(col), .row(row)) core_instance (
 	.clk(clk), 
 	.inst(inst_q),
 	.ofifo_valid(ofifo_valid),
-        .D_xmem(D_xmem_q), 
-        .sfp_out(sfp_out),
-        .l0_ready (l0_ready),
-        .ififo_ready  (ififo_ready), 
+  .D_xmem(D_xmem_q), 
+  .sfp_out(sfp_out),
+  .l0_ready(l0_ready),
+  .ififo_ready(ififo_ready), 
 	.reset(reset));
 
 always #0.5 clk = ~clk;
@@ -148,7 +128,6 @@ initial begin
   A0_xmem   = 0;
   CEN1_xmem = 1;
   A1_xmem   = 0;
-  //ofifo_rd = 0;
   ififo_wr = 0;
   ififo_rd = 0;
   l0_rd    = 0;
@@ -161,7 +140,6 @@ initial begin
   $dumpvars(0,core_tb);
 
   x_file = $fopen("WS_activation.txt", "r");
-  //x_file = $fopen("WS_activation.txt", "r");
   // Following three lines are to remove the first three comment lines of the file
   x_scan_file = $fscanf(x_file,"%s", captured_data);
   x_scan_file = $fscanf(x_file,"%s", captured_data);
@@ -191,7 +169,7 @@ initial begin
   //-----------------------------------------------------------------------------------------------------------------
 
   $display("Writing Weight Data to XMEM");
-  for (kij=0; kij<9; kij=kij+1) begin  // Weight loading to SRAM loop
+  for (kij=0; kij<9; kij=kij+1) begin
 
     case(kij)
       //0: w_file_name = "weight.txt";
@@ -214,7 +192,7 @@ initial begin
 
     //---------------------------------- Kernel data writing to memory --------------------------------------------------
 
-    for (t=0; t<col; t=t+1) begin  //iterating over all cols (oc)
+    for (t=0; t<col; t=t+1) begin
       #1 w_scan_file = $fscanf(w_file,"%32b", D_xmem); WEN0_xmem = 0; CEN0_xmem = 0; 
       if (t==0) begin 
         A0_xmem = 8'b10000000 + kij*8'h8;
@@ -223,11 +201,12 @@ initial begin
     end
     //------------------------------------------------------------------------------------------------------------------
 
-  end // end of Weight loading to SRAM loop
+  end
 
   #1 WEN0_xmem = 1;  CEN0_xmem = 1;
   $display("Finished Writing Weight Data to XMEM");
   #1
+
   psum_bypass = 1;
   $display("Starting Load and Execute");
   fork
