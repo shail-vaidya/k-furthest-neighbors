@@ -11,7 +11,7 @@ parameter len_onij = 16;
 parameter col = 8;
 parameter row = 8;
 //FIXME: Reducing len nij to take only 9 inputs first, later set to 72
-parameter len_nij = 9;
+parameter len_nij = 27;
 
 reg clk = 1;
 reg reset = 1;
@@ -152,7 +152,6 @@ initial begin
   $dumpfile("core_tb.vcd");
   $dumpvars(0,core_tb);
 
-  //x_file = $fopen("activation_tile0.txt", "r");
 //FIXME: Update file to take the activation file made for output stationary
 
 //HERE h=6 as input is padded					op_pixel7     op_pixel6     op_pixel5     op_pixel4     op_pixel3     op_pixel2     op_pixel1     op_pixel0 
@@ -178,7 +177,8 @@ initial begin
 //72nd file_write of act should be ic=7(row) for all op pixels [time5+3hrow7, time4+3hrow7, time3+3hrow7, time2+3hrow7, time5+2hrow7, time4+2hrow7, time3+2hrow7, time2+2hrow7]
 
 
-  x_file = $fopen("output_stationary_activation.txt", "r");
+  //x_file = $fopen("output_stationary_activation.txt", "r");
+  x_file = $fopen("OS_activation.txt", "r");
   // Following three lines are to remove the first three comment lines of the file
   x_scan_file = $fscanf(x_file,"%s", captured_data);
   x_scan_file = $fscanf(x_file,"%s", captured_data);
@@ -221,7 +221,8 @@ initial begin
 //...
 //72nd file_write of weights should be kij=8, ic=7(row) for all oc(col) values	[col7row7, col6row7, col5row7, col4row7, col3row7, col2row7, col1row7, col0row7]
 
-  w_file = $fopen("output_stationary_weight.txt", "r");
+  //w_file = $fopen("output_stationary_weight.txt", "r");
+  w_file = $fopen("OS_weight.txt", "r");
   // Following three lines are to remove the first three comment lines of the file
   w_scan_file = $fscanf(w_file,"%s", captured_data);
   w_scan_file = $fscanf(w_file,"%s", captured_data);
@@ -292,7 +293,8 @@ initial begin
   execute = 0;
   load = 0;
   
-  out_file = $fopen("output_stationary_out.txt", "r");  
+  //out_file = $fopen("output_stationary_out.txt", "r");  
+  out_file = $fopen("OS_out.txt", "r");  
   out_scan_file = $fscanf(out_file,"%s", answer); 
   out_scan_file = $fscanf(out_file,"%s", answer); 
   out_scan_file = $fscanf(out_file,"%s", answer); 
