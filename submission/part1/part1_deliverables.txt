@@ -1,0 +1,3 @@
+VGG16_Quantization_Aware_Training.ipynb
+VGG16_Quantization_Aware_Training.pdf
+Any other miscellaneous files
