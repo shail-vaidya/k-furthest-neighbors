@@ -13,12 +13,16 @@ reg acc;
 reg acc_i;
 reg pbp_i;
 reg psum_bypass_i;
+reg mp_i;
+reg max_pool_en_i;
 wire [psum_bw*col-1:0] sfu_out;
-integer psum_file, acc_file, pbp_file;
-integer psum_result, acc_result, pbp_result;
+wire [psum_bw*col-1:0] max_pool_out;
+
+integer psum_file, acc_file, pbp_file, mp_file;
+integer psum_result, acc_result, pbp_result, mp_result;
 
 
-sfu #(
+sfu_max_pool #(
     .bw     (bw),
     .col    (col),
     .row    (row),
@@ -28,6 +32,7 @@ sfu #(
     .reset      (reset),
     .acc_i      (acc_i),
     .psum_bypass_i (psum_bypass_i),
+    .max_pool_en_i  (max_pool_en_i),
     .psum_in    (psum_in),
     .psum_out   (sfu_out)
 );
@@ -41,8 +46,14 @@ initial begin
     clk = 1;
     psum_in = {psum_bw*col{1'b0}};
     acc_i = 0;
-    #20
+    #15
     reset = 1'b0;
+
+    mp_file = $fopen("max_pool_en.txt", "r");
+    if (mp_file == 0) begin
+        $display("Error opening psum.txt");
+        $finish;
+    end
 
 
     psum_file = $fopen("psum.txt", "r");
@@ -63,22 +74,26 @@ initial begin
         $finish;
     end
 
-    while (!$feof(psum_file) && !$feof(acc_file) &&  !$feof(pbp_file)) begin
+    while (!$feof(psum_file) && !$feof(acc_file) &&  !$feof(pbp_file) &&  !$feof(mp_file)) begin
             // Read the next value from each file
             psum_result = $fscanf(psum_file, "%h,", psum); 
             acc_result = $fscanf(acc_file, "%b,", acc);
             pbp_result = $fscanf(pbp_file, "%b,", pbp_i);
+            mp_result =  $fscanf(mp_file, "%b,", mp_i);
 
             if (psum_result == 1 && acc_result == 1 && pbp_result == 1) begin
                 psum_in = psum;  
                 acc_i = acc;  
                 psum_bypass_i = pbp_i;
+                max_pool_en_i = mp_i;
                 #10;  // Wait for 10 time units
             end
         end
     $fclose(psum_file);
     $fclose(acc_file);
     $fclose(pbp_file);
+    $fclose(mp_file);
+
 
     #20
     $finish;
