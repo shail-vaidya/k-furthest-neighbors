@@ -50,6 +50,8 @@ wire [bw*col-1:0]       ififo_rdata;
 wire [psum_bw*col-1:0]  in_n;
 wire [bw*row-1:0]       l0_rdata;
 wire [psum_bw*col-1:0]  sfp_psum_muxed;
+wire [row-1:0] in_w_zero;
+wire [col-1:0] in_n_zero;
 
 
 //*************************************************************
@@ -61,6 +63,8 @@ genvar i;
     generate
     for (i=0; i < col ; i=i+1) begin : corelet_in_n_connection
         assign in_n[psum_bw*(i+1)-1:psum_bw*i] = {{(psum_bw-bw){1'b0}},ififo_rdata[bw*(i+1)-1:bw*i]};
+        assign in_n_zero[i] = ~(|ififo_rdata[bw*(i+1)-1:bw*i]);
+        assign in_w_zero[i] = ~(|l0_rdata[bw*(i+1)-1:bw*i]);
     end
     endgenerate
 
@@ -77,7 +81,9 @@ mac_array #(
     .reset      (reset),
     .out_s      (ofifo_wdata),
     .in_n       (in_n),
+    .in_n_zero  (in_n_zero),
     .in_w       (l0_rdata),
+    .in_w_zero  (in_w_zero),
     .inst_w     (inst_w),
     .valid      (ofifo_wr)
 );
