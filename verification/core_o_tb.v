@@ -256,19 +256,30 @@ initial begin
   // -------------------------- Output pixels are rendered from bottom first ------------------------------ //
 
   //out_file = $fopen("output_stationary_out.txt", "r");  
-  out_file = $fopen("OS_out.txt", "r");  
+  out_file = $fopen("OS_out_maxpool.txt", "r");  
   out_scan_file = $fscanf(out_file,"%s", answer); 
   out_scan_file = $fscanf(out_file,"%s", answer); 
   out_scan_file = $fscanf(out_file,"%s", answer); 
   error = 0;
   $display("############ Verification Start during accumulation #############"); 
 
-  n = 8+1;
+  n = 8+1+1;
   while (n>0) begin
     fork
 
       begin
-	if (ofifo_valid & (n>1)) begin
+	if (ofifo_valid & (n>6)) begin
+	  #1;
+	  $display("found ofifo_valid high. reading now");
+      	  ofifo_rd = 1;
+          max_pool_en = 1;
+	end
+	else if (ofifo_valid & (n==6)) begin
+	  #1;
+	  ofifo_rd = 0;
+    max_pool_en = 0;
+	end
+  else if (ofifo_valid & (n>1)) begin
 	  #1;
 	  $display("found ofifo_valid high. reading now");
       	  ofifo_rd = 1;
@@ -282,7 +293,22 @@ initial begin
       end
 
       begin
-	if (ofifo_valid & (n<9)) begin
+	if (ofifo_valid & (n==5)) begin
+	  #1;
+	  out_scan_file = $fscanf(out_file,"%128b", answer);
+	  if (sfp_out == answer) begin
+	    $display("%2d-th output featuremap Data matched! :D", n);
+	    //$display("sfpout: %128b", sfp_out);
+	    //$display("answer: %128b", answer);
+	  end
+	  else begin
+	    $display("%2d-th output featuremap Data ERROR!!", n); 
+	    $display("sfpout: %128b", sfp_out);
+	    $display("answer: %128b", answer);
+	    error = 1;
+	  end
+	end
+  else if (ofifo_valid & (n==0)) begin
 	  #1;
 	  out_scan_file = $fscanf(out_file,"%128b", answer);
 	  if (sfp_out == answer) begin
