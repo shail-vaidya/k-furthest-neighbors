@@ -1,0 +1,17 @@
+../verilog/fifo_mux_2_1.v
+../verilog/fifo_mux_8_1.v
+../verilog/fifo_mux_16_1.v
+../verilog/fifo_depth8.v
+../verilog/fifo_depth16.v
+../verilog/l0.v
+../verilog/ofifo.v
+../verilog/mac.v
+../verilog/mac_tile.v
+../verilog/mac_row.v
+../verilog/mac_array.v
+../verilog/sfu.v
+../verilog/corelet.v
+../verilog/xmem_256x32.v
+../verilog/pmem_512x128.v
+../verilog/core.v
+./core_tb.v
