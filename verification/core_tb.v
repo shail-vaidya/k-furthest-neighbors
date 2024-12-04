@@ -51,6 +51,8 @@ reg acc_s1_q = 0;
 reg acc = 0;
 reg psum_bypass = 0;
 reg psum_bypass_q = 0;
+reg max_pool_en =0;
+reg max_pool_en_q =0;
 reg [1:0]  inst_w; 
 reg [bw*row-1:0] D_xmem;
 reg [psum_bw*col-1:0] answer;
@@ -66,7 +68,7 @@ reg [8*30:1] w_file_name;
 reg ofifo_valid_q;
 
 wire ofifo_valid;
-wire [39:0] inst_q; 
+wire [40:0] inst_q; 
 wire [col*psum_bw-1:0] sfp_out;
 wire l0_ready;
 wire ififo_ready;
@@ -85,6 +87,7 @@ integer error;
 
 
 //-----------------------------------Instruction Mapping------------------------------------------
+assign inst_q[40]     = max_pool_en_q;
 assign inst_q[39] 	  = psum_bypass_q;
 assign inst_q[38] 	  = acc_q;
 assign inst_q[37] 	  = CEN_pmem_q;
@@ -429,6 +432,7 @@ always @ (posedge clk) begin
    load_s2_q  <= load_s1_q;
    execute_s1_q  <= execute;
    execute_s2_q  <= execute_s1_q;
+   max_pool_en_q <= max_pool_en;
 
    mode_q     <= mode_s2_q;
    execute_q  <= execute_s2_q;

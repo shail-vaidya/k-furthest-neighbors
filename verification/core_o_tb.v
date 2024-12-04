@@ -51,6 +51,8 @@ reg acc_q = 0;
 reg acc = 0;
 reg psum_bypass_q =0;
 reg psum_bypass =0;
+reg max_pool_en =0;
+reg max_pool_en_q =0;
 reg [1:0]  inst_w; 
 reg [bw*row-1:0] D_xmem;
 reg [psum_bw*col-1:0] answer;
@@ -65,7 +67,7 @@ reg load;
 reg [8*30:1] stringvar;
 reg [8*30:1] w_file_name;
 
-wire [39:0] inst_q;
+wire [40:0] inst_q;
 wire ofifo_valid;
 wire [col*psum_bw-1:0] sfp_out;
 wire l0_ready;
@@ -82,6 +84,7 @@ integer error;
 
 // ----------------------------------- Instruction Mapping ------------------------------------------ //
 
+assign inst_q[40]     = max_pool_en_q;
 assign inst_q[39] 	  = psum_bypass_q;
 assign inst_q[38] 	  = acc_q;
 assign inst_q[37] 	  = CEN_pmem_q;
@@ -269,10 +272,12 @@ initial begin
 	  #1;
 	  $display("found ofifo_valid high. reading now");
       	  ofifo_rd = 1;
+          max_pool_en = 1;
 	end
 	else if (ofifo_valid & (n==1)) begin
 	  #1;
 	  ofifo_rd = 0;
+    max_pool_en = 0;
 	end
       end
 
@@ -337,6 +342,7 @@ always @ (posedge clk) begin
    l0_rd_q    <= l0_rd;
    l0_wr_q    <= l0_wr ;
    psum_bypass_q <= psum_bypass;
+   max_pool_en_q <= max_pool_en;
 
    mode_s1_q  <= mode;
    mode_s2_q  <= mode_s1_q;
