@@ -37,6 +37,7 @@ module corelet #(
     // SFP Ports
     input   [psum_bw*col-1:0]   sfp_psum_i,
     input                       sfp_acc_i,
+    input                       sfp_max_pool_en_i,
     input                       sfp_psum_bypass,
     output  [psum_bw*col-1:0]   sfp_out
 );
@@ -152,6 +153,7 @@ sfu #(
     .clk            (clk),
     .reset          (reset),
     .acc_i          (sfp_acc_i),
+    .max_pool_en_i  (max_pool_en_i),
     .psum_bypass_i  (sfp_psum_bypass),
     .psum_in        (sfp_psum_muxed),
     .psum_out       (sfp_out)

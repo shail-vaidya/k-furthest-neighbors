@@ -15,7 +15,7 @@ module core #(
     input                       clk,
     input                       reset,
     input   [bw*row-1:0]        D_xmem,
-    input   [39:0]              inst,
+    input   [40:0]              inst,
     output                      ofifo_valid,
     output                      l0_ready,
     output                      ififo_ready,
@@ -25,6 +25,7 @@ module core #(
 //***********************************************
 //        Instruction Mapping
 //***********************************************
+//  inst[40]      = max_pool_en_q;
 //  inst[39]      = psum_bypass_q;
 //  inst[38]      = acc_q;
 //  inst[37]      = CEN_pmem_q;
@@ -86,6 +87,7 @@ corelet #(
     .ififo_ready        (ififo_ready),
     // SFP Ports
     .sfp_acc_i          (inst[38]),
+    .sfp_max_pool_en_i  (inst[40]),
     .sfp_psum_bypass    (inst[39]),
     .sfp_psum_i         (sfu_i_data),
     .sfp_out            (sfp_out)
