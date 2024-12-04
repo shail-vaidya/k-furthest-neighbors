@@ -76,7 +76,7 @@ wire ofifo_rd;
 integer x_file, x_scan_file ; // file_handler
 integer w_file, w_scan_file ; // file_handler
 integer o_file, o_scan_file ; // file_handler
-integer pmem_file, pmem_scan_file; //file_handler
+integer psum_file, psum_scan_file; //file_handler
 integer acc_file, acc_scan_file ; // file_handler
 integer out_file, out_scan_file ; // file_handler
 integer captured_data, output_data;
@@ -206,6 +206,10 @@ initial begin
   #1 WEN0_xmem = 1;  CEN0_xmem = 1;
   $display("Finished Writing Weight Data to XMEM");
   #1
+  psum_file = $fopen("WS_psum.txt", "r");
+  psum_scan_file = $fscanf(psum_file,"%s", captured_data);
+  psum_scan_file = $fscanf(psum_file,"%s", captured_data);
+  psum_scan_file = $fscanf(psum_file,"%s", captured_data);
 
   psum_bypass = 1;
   $display("Starting Load and Execute");
@@ -310,14 +314,13 @@ initial begin
     begin
       m2=len_nij*len_kij;
       n2 = len_nij;
-      count = 0;
-      pmem_file = $fopen("WS_psum.txt", "r");  
+      count = 0; 
       error = 0;
       while (m2 > 0) begin
         if(ofifo_valid) begin
           #1;
           if(n2>0) begin
-            pmem_scan_file = $fscanf(pmem_file,"%128b", answer);
+            psum_scan_file = $fscanf(psum_file,"%128b", answer);
             if (answer == sfp_out) begin
               count = count + 1;
             end
