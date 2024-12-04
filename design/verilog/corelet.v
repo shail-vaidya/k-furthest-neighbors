@@ -153,7 +153,7 @@ sfu_max_pool #(
     .clk            (clk),
     .reset          (reset),
     .acc_i          (sfp_acc_i),
-    .max_pool_en_i  (max_pool_en_i),
+    .max_pool_en_i  (sfp_max_pool_en_i),
     .psum_bypass_i  (sfp_psum_bypass),
     .psum_in        (sfp_psum_muxed),
     .psum_out       (sfp_out)
