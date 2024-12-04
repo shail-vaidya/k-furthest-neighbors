@@ -1,6 +1,6 @@
 // Created by prof. Mingu Kang @VVIP Lab in UCSD ECE department
 // Please do not spread this code without permission 
-module mac_array (clk, reset, out_s, in_w, in_n, inst_w, valid);
+module mac_array (clk, reset, out_s, in_w, in_n, inst_w, in_n_zero, in_w_zero, valid);
 
   parameter bw = 4;
   parameter psum_bw = 16;
@@ -11,13 +11,16 @@ module mac_array (clk, reset, out_s, in_w, in_n, inst_w, valid);
   output [psum_bw*col-1:0] out_s;
   input  [row*bw-1:0] in_w;
   input  [2:0] inst_w;  	// inst[2]:mode, inst[1]:execute, inst[0]: kernel loading
+  input  [row-1:0] in_w_zero;
   input  [psum_bw*col-1:0] in_n;
+  input  [col-1:0] in_n_zero;
   output [col-1:0] valid;
 
   wire [row*col-1:0] temp_valid;	// Wires for connecting the valid signals of each row
   wire [psum_bw*col*(row+1)-1:0] temp;
   wire [3*row-1:0] temp_inst_in; 	// Wires to connect to input of temp_inst_q registers
   wire [3*row-1:0] temp_inst_out;
+  wire [col*(row+1)-1:0] temp_n_zero;
 
   genvar i;
   generate
@@ -27,8 +30,11 @@ module mac_array (clk, reset, out_s, in_w, in_n, inst_w, valid);
       	.reset (reset),
 	      .inst_w(temp_inst_out[3*i-1:3*(i-1)]),
 	      .in_w(in_w[bw*i-1:bw*(i-1)]),
+        .in_w_zero(in_w_zero[i-1]),
 	      .in_n(temp[psum_bw*col*i-1:psum_bw*col*(i-1)]),
+        .in_n_zero(temp_n_zero[col*i-1:col*(i-1)]),
 	      .out_s(temp[psum_bw*col*(i+1)-1:psum_bw*col*i]),
+        .out_s_zero(temp_n_zero[col*(i+1)-1:col*i]),
 	      .valid(temp_valid[col*i-1:col*(i-1)])
       );
     end
@@ -36,6 +42,7 @@ module mac_array (clk, reset, out_s, in_w, in_n, inst_w, valid);
 
   assign out_s = temp[psum_bw*col*(row+1)-1:psum_bw*col*row];	// Taking out_s of the last row as the final outputs of the mac_array 
   assign temp[psum_bw*col-1:0] = in_n[psum_bw*col-1:0];
+  assign temp_n_zero[col-1:0] = in_n_zero[col-1:0];
 
   assign valid = temp_valid[row*col-1:(row-1)*col];		// Taking valids of the last row as the final valids for the columns of mac_array
 
