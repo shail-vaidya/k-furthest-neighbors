@@ -10,6 +10,7 @@
 ../design/verilog/PE_array/mac_row.v
 ../design/verilog/PE_array/mac_array.v
 ../design/verilog/SFU/sfu.v
+../design/verilog/SFU/sfu_max_pool.v
 ../design/verilog/corelet.v
 ../design/verilog/memories/xmem_256x32.v
 ../design/verilog/memories/pmem_512x128.v

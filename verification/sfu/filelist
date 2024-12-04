@@ -1,2 +1,2 @@
-../../design/verilog/SFU/sfu.v
+../../design/verilog/SFU/sfu_max_pool.v
 ./sfu_tb.v
