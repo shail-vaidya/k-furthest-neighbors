@@ -10,8 +10,9 @@
 ../verilog/mac_row.v
 ../verilog/mac_array.v
 ../verilog/sfu.v
+../verilog/sfu_max_pool.v
 ../verilog/corelet.v
 ../verilog/xmem_256x32.v
 ../verilog/pmem_512x128.v
 ../verilog/core.v
-./core_o_tb.v
+./core_o_tb_max_pool.v
